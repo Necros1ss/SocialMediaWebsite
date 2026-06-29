@@ -124,7 +124,7 @@ public class ChatMediaServiceImpl implements ChatMediaService {
                     })
                     .collect(Collectors.toList());
 
-            String commonType = mediaList.isEmpty() ? "FILE" : mediaList.getFirst().getMediaType();
+            String commonType = mediaList.isEmpty() ? "FILE" : mediaList.get(0).getMediaType();
 
             return new FileDto(
                     message.getMessageId(),

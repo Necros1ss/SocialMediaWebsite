@@ -1,0 +1,85 @@
+spring:
+  application:
+    name: social-media-app-test
+    frontend: http://localhost:3000
+
+  # --- RABBITMQ ---
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: admin
+    stomp:
+      port: 1613
+
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MSSQLServer
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: create-drop
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: dummy
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: dummy
+    password: dummy
+    from: dummy
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: dummy
+            client-secret: dummy
+          facebook:
+            client-id: dummy
+            client-secret: dummy
+
+# --- MINIO ---
+minio:
+  endpoint: http://localhost:9000
+  access-key: dummy
+  secret-key: dummy
+  bucket-name: social-media-images
+
+# --- JWT ---
+jwt:
+  secret: dGVzdF9zZWNyZXRfdGVzdF9zZWNyZXRfdGVzdF9zZWNyZXRfdGVzdF9zZWNyZXQ=
+  access:
+    token:
+      ttl: 3600
+      cookie:
+        name: access_token
+  refresh:
+    token:
+      ttl: 86400
+      cookie:
+        name: refresh_token
+
+# --- TWILIO ---
+twilio:
+  account-sid: dummy
+  auth-token: dummy
+  phone-number: dummy
+  messaging-service-sid: dummy
+
+recaptcha:
+  secret-key: dummy
+  verify-url: http://dummy
