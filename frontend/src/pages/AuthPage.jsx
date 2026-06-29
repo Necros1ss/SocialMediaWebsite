@@ -10,12 +10,19 @@ import RegisterForm from '../components/Auth/RegisterForm';
 import OTPVerification from '../components/Auth/OTPVerification';
 import SocialButton from '../components/Common/SocialButton';
 
-const AuthPage = ({ isDark, onToggleDark, onAuthSuccess }) => {
-  const [mode, setMode] = useState('login');
+const AuthPage = ({ isDark, onToggleDark, onAuthSuccess, initialMode }) => {
+  const [mode, setMode] = useState(initialMode || 'login');
   const [showOTP, setShowOTP] = useState(false);
   const [shouldAutoSend, setShouldAutoSend] = useState(false);
   const [registeredIdentifier, setRegisteredIdentifier] = useState('');
   const [registeredChannel, setRegisteredChannel] = useState('EMAIL');
+
+  React.useEffect(() => {
+    if (initialMode) {
+      setMode(initialMode);
+    }
+  }, [initialMode]);
+
   const handleSwitch = (newMode) => {
     setMode(newMode);
   };

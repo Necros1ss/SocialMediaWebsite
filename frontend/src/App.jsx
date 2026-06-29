@@ -1,11 +1,12 @@
-
 import React, { useEffect, useState } from 'react';
+import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import AuthPage from './pages/AuthPage';
-import Dashboard from './pages/Dashboard';
 import Messenger from './pages/Messenger';
 import FeedPage from './pages/FeedPage';
+import ProfilePage from './pages/ProfilePage';
 import OAuth2Callback from './pages/OAuth2Callback';
 import GalaxyBackground from './components/Background/GalaxyBackground';
+import ProtectedRoute from './components/Common/ProtectedRoute';
 import './styles/base.css';
 import './styles/responsive.css';
 import api from './services/api';
@@ -15,8 +16,10 @@ export default function App() {
     const saved = localStorage.getItem('theme');
     return saved ? saved === 'dark' : true;
   });
-  const [currentPage, setCurrentPage] = useState('auth'); // 'auth' | 'feed' | 'messenger' | 'oauth2-callback'
-  const [userId, setUserId] = useState(null);
+  const [user, setUser] = useState(null);
+  const [loadingAuth, setLoadingAuth] = useState(true);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = async () => {
     try {
@@ -25,46 +28,35 @@ export default function App() {
       console.error('Logout error:', e);
     }
     localStorage.removeItem('autoLogin');
-    setUserId(null);
-    setCurrentPage('auth');
+    setUser(null);
+    navigate('/login');
   };
 
   const handleAuthSuccess = async () => {
-    // Get user info after login
     const me = await api.me();
     if (me) {
-      setUserId(me.userId || me.id);
+      setUser(me);
     }
-    setCurrentPage('feed');
+    navigate('/');
   };
 
-  const handleNavigateToMessenger = () => {
-    setCurrentPage('messenger');
-  };
-
-  const handleNavigateToFeed = () => {
-    setCurrentPage('feed');
-  };
-
-  // Khi app load, kiểm tra route và session
+  // Restores session/authentication on load or refresh
   useEffect(() => {
     let mounted = true;
-
-    // Kiểm tra nếu đang ở route OAuth2 callback
-    const path = window.location.pathname;
-    if (path === '/oauth2/success') {
-      setCurrentPage('oauth2-callback');
-      return;
-    }
-
-    // Auto-login nếu đã bật remember me
-    const shouldAutoLogin = localStorage.getItem('autoLogin') === '1';
     (async () => {
-      if (!shouldAutoLogin) return;
-      const me = await api.me();
-      if (mounted && me) {
-        setUserId(me.userId || me.id);
-        setCurrentPage('feed');
+      try {
+        const me = await api.me();
+        if (mounted) {
+          if (me) {
+            setUser(me);
+          } else {
+            setUser(null);
+          }
+        }
+      } catch (e) {
+        if (mounted) setUser(null);
+      } finally {
+        if (mounted) setLoadingAuth(false);
       }
     })();
     return () => { mounted = false; };
@@ -75,40 +67,46 @@ export default function App() {
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
   }, [isDark]);
 
-  const renderPage = () => {
-    switch (currentPage) {
-      case 'auth':
-        return (
-          <AuthPage
-            isDark={isDark}
-            onToggleDark={() => setIsDark(!isDark)}
-            onAuthSuccess={handleAuthSuccess}
-          />
-        );
-      case 'oauth2-callback':
-        return <OAuth2Callback onAuthSuccess={handleAuthSuccess} />;
-      case 'feed':
-        return (
-          <FeedPage
-            userId={userId}
-            isDark={isDark}
-            setIsDark={setIsDark}
-            onNavigateToMessenger={handleNavigateToMessenger}
-            onLogout={handleLogout}
-          />
-        );
-      case 'messenger':
-        return <Messenger onBack={handleNavigateToFeed} />;
-      default:
-        return null;
-    }
-  };
+  if (loadingAuth) {
+    return <div className="loading" style={{ color: '#fff', textAlign: 'center', marginTop: '20%' }}>Loading...</div>;
+  }
+
+  const isAuthRoute = location.pathname === '/login' || location.pathname === '/register';
 
   return (
     <div className={`app ${isDark ? 'dark' : 'light'}`}>
-      {currentPage === 'auth' && <GalaxyBackground isDark={isDark} />}
+      {isAuthRoute && <GalaxyBackground isDark={isDark} />}
       <div className="app-content">
-        {renderPage()}
+        <Routes>
+          <Route path="/login" element={user ? <Navigate to="/" replace /> : <AuthPage isDark={isDark} onToggleDark={() => setIsDark(!isDark)} initialMode="login" onAuthSuccess={handleAuthSuccess} />} />
+          <Route path="/register" element={user ? <Navigate to="/" replace /> : <AuthPage isDark={isDark} onToggleDark={() => setIsDark(!isDark)} initialMode="register" onAuthSuccess={handleAuthSuccess} />} />
+          <Route path="/oauth2/success" element={<OAuth2Callback onAuthSuccess={handleAuthSuccess} />} />
+          
+          <Route path="/" element={
+            <ProtectedRoute user={user} loadingAuth={loadingAuth}>
+              <FeedPage
+                userId={user?.userId || user?.id}
+                isDark={isDark}
+                setIsDark={setIsDark}
+                onLogout={handleLogout}
+              />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/messenger" element={
+            <ProtectedRoute user={user} loadingAuth={loadingAuth}>
+              <Messenger />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/profile/:username" element={
+            <ProtectedRoute user={user} loadingAuth={loadingAuth}>
+              <ProfilePage user={user} />
+            </ProtectedRoute>
+          } />
+
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </div>
     </div>
   );

@@ -1,5 +1,7 @@
+import { useNavigate } from "react-router-dom";
 import "../../styles/sidebar.css";
-const Sidebar = ({ isDark, setIsDark, currentView, setCurrentView, onNavigateToMessenger, onLogout }) => {
+const Sidebar = ({ isDark, setIsDark, currentView, setCurrentView, onLogout }) => {
+  const navigate = useNavigate();
   const toggle = () => {
     if (isDark) {
       localStorage.setItem("theme", "light");
@@ -13,7 +15,7 @@ const Sidebar = ({ isDark, setIsDark, currentView, setCurrentView, onNavigateToM
       {/* Message Button */}
       <div
         className="message container"
-        onClick={onNavigateToMessenger}
+        onClick={() => navigate("/messenger")}
       >
         <svg
           fill="currentColor"

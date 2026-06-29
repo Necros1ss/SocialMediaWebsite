@@ -4,6 +4,7 @@ import './index.css'
 import App from './App.jsx'
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3'
 import { CONFIG } from './config/constants'
+import { BrowserRouter } from 'react-router-dom'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -11,7 +12,9 @@ createRoot(document.getElementById('root')).render(
       reCaptchaKey={CONFIG.RECAPTCHA_SITE_KEY}
       scriptProps={{ async: true, defer: true }}
     >
-      <App />
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
     </GoogleReCaptchaProvider>
   </StrictMode>,
 )

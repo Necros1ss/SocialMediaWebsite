@@ -11,7 +11,6 @@ const FeedPage = ({
   userId,
   isDark,
   setIsDark,
-  onNavigateToMessenger,
   onLogout,
 }) => {
   const [feed, setFeed] = useState([]);
@@ -92,7 +91,6 @@ const FeedPage = ({
         setIsDark={setIsDark}
         currentView={currentView}
         setCurrentView={setCurrentView}
-        onNavigateToMessenger={onNavigateToMessenger}
         onLogout={onLogout}
       />
       {currentView !== "post" ? (
