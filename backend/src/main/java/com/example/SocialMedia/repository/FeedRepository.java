@@ -9,9 +9,10 @@ import org.springframework.data.repository.query.Param;
 
 public interface FeedRepository extends JpaRepository<Post, Integer> {
     @Query("SELECT p FROM Post p " +
-            "JOIN Follow f ON f.userFollowing.id = p.user.id " +
-            "WHERE f.userFollower.id = :userId " +
-            "AND p.isDeleted = false " +
+            "WHERE p.isDeleted = false " +
+            "AND (p.visibility = 'public' " +
+            "     OR p.user.id = :userId " +
+            "     OR p.user.id IN (SELECT f.userFollowing.id FROM Follow f WHERE f.userFollower.id = :userId)) " +
             "ORDER BY p.createdLocalDateTime DESC")
     Page<Post> findFeed(@Param("userId") Integer userId, Pageable pageable);
     @Query("SELECT p FROM Post p " +

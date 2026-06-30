@@ -79,6 +79,7 @@ public class PostMapper {
                 .reactionCounts(reactionMap)
                 .shareCount(shareCount)
                 .medias(mediaResponses)
+                .visibility(post.getVisibility())
                 .build();
     }
 }

@@ -35,6 +35,9 @@ public class Post {
     @Column(name = "Location")
     private String location;
 
+    @Column(name = "Visibility", nullable = false)
+    private String visibility = "public";
+
     @Column(name = "IsArchived")
     private boolean isArchived = false;
 

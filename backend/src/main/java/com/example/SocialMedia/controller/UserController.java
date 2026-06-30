@@ -32,6 +32,8 @@ public class UserController {
     public ResponseEntity<UserProfileDto> updateProfile(
             @RequestParam(value = "fullName", required = false) String fullName,
             @RequestParam(value = "bio", required = false) String bio,
+            @RequestParam(value = "email", required = false) String email,
+            @RequestParam(value = "phone", required = false) String phone,
             @RequestParam(value = "avatar", required = false) MultipartFile avatar,
             @RequestParam(value = "cover", required = false) MultipartFile cover,
             @AuthenticationPrincipal UserDetails userDetails
@@ -44,6 +46,12 @@ public class UserController {
         }
         if (bio != null) {
             user.setBio(bio);
+        }
+        if (email != null && !email.isBlank()) {
+            user.setEmail(email);
+        }
+        if (phone != null && !phone.isBlank()) {
+            user.setPhoneNumber(phone);
         }
         if (avatar != null && !avatar.isEmpty()) {
             var uploadResp = minioService.uploadFile(avatar);

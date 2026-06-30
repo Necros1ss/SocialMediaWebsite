@@ -21,6 +21,7 @@ public class PostResponse {
     private String username;
     private String avatarUrl; // Thêm avatar cho đẹp
     private Integer interactableItemId;
+    private String visibility;
 
     private Map<String, Long> reactionCounts;
 
