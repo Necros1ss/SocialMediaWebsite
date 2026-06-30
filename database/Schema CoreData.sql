@@ -1,4 +1,4 @@
-﻿-- *******************************************************************
+-- *******************************************************************
 -- SOCIAL MEDIA DATABASE
 -- *******************************************************************
 DROP DATABASE IF EXISTS SocialMedia;
@@ -8,6 +8,15 @@ CREATE DATABASE SocialMedia;
 GO
 
 USE SocialMedia;
+GO
+
+SET QUOTED_IDENTIFIER ON;
+SET ANSI_NULLS ON;
+SET ANSI_PADDING ON;
+SET ANSI_WARNINGS ON;
+SET ARITHABORT ON;
+SET CONCAT_NULL_YIELDS_NULL ON;
+SET NUMERIC_ROUNDABORT OFF;
 GO
 
 -- *******************************************************************
@@ -31,6 +40,7 @@ CREATE TABLE CoreData.Users (
     FullName NVARCHAR(100) COLLATE Vietnamese_CI_AS,
     Bio NVARCHAR(500) COLLATE Vietnamese_CI_AS, 
 	ProfilePictureURL NVARCHAR(2048),
+    CoverPictureURL NVARCHAR(2048),
     CreatedAt DATETIME DEFAULT GETDATE(),
 	LastLogin DateTime,
 	AuthProvider NVARCHAR(20),
@@ -107,6 +117,7 @@ CREATE TABLE CoreData.Posts (
     Content NVARCHAR(MAX), 
     PostTopic NVARCHAR(50),
     Location NVARCHAR(100),
+    Visibility NVARCHAR(20) NOT NULL DEFAULT 'public',
     IsArchived BIT DEFAULT 0,
     CreatedAt DATETIME DEFAULT GETDATE(),
     UpdatedAt DATETIME,
@@ -155,7 +166,7 @@ CREATE TABLE CoreData.PostMedia (
     MediaID BIGINT PRIMARY KEY IDENTITY(1,1),
     PostID INT NOT NULL, 
     InteractableItemID BIGINT UNIQUE NOT NULL,
-    MediaURL NVARCHAR(255) NOT NULL, 
+    FileName NVARCHAR(255) NOT NULL, 
     MediaType NVARCHAR(10) NOT NULL 
         CHECK (MediaType IN ('IMAGE', 'VIDEO')),
     Caption NVARCHAR(500),

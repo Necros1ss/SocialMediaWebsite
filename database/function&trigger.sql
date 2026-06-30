@@ -1,7 +1,13 @@
-USE SocialMedia
+USE SocialMedia;
+GO
+
+SET QUOTED_IDENTIFIER ON;
+SET ANSI_NULLS ON;
+GO
+
 DROP PROCEDURE IF EXISTS CleanAndReseedTable;
-EXEC CleanAndReseedTable @TableName = 'CoreData.Users';
-DELETE FROM CoreData.Posts WHERE PostID = 10
+GO
+
 CREATE PROCEDURE CleanAndReseedTable
     @TableName NVARCHAR(128)
 AS
@@ -20,20 +26,26 @@ BEGIN
 
     -- Execute the DBCC CHECKIDENT query
     EXEC sp_executesql @SqlReseed
-END
---- Drop trigger
-DROP TRIGGER CoreData.trg_DeletePostCascade
-DROP TRIGGER CoreData.trg_DeleteCommentCascade
+END;
+GO
+
+--- Drop triggers if they exist
+DROP TRIGGER IF EXISTS CoreData.trg_DeletePostCascade;
+DROP TRIGGER IF EXISTS CoreData.trg_DeleteCommentCascade;
+DROP TRIGGER IF EXISTS CoreData.trg_DeleteShareCascade;
+DROP TRIGGER IF EXISTS Messaging.trg_DeleteMessageCascade;
+GO
+
 ---Post
 CREATE TRIGGER trg_DeletePostCascade
 ON CoreData.Posts
 AFTER DELETE
 AS
 BEGIN
-    -- Delete FeedItems when a Share is deleted
-    DELETE FROM CoreData.FeedItems WHERE FeedItemID IN (SELECT ShareID FROM deleted) AND ActivityType = 'CREATED';
+    -- Delete FeedItems when a Post is deleted
+    DELETE FROM CoreData.FeedItems WHERE PostID IN (SELECT PostID FROM deleted);
     -- Delete InteractableItems when a Post is deleted
-    DELETE FROM CoreData.InteractableItems WHERE InteractableItemID IN (SELECT PostID FROM deleted);
+    DELETE FROM CoreData.InteractableItems WHERE InteractableItemID IN (SELECT InteractableItemID FROM deleted);
 END;
 GO
 
@@ -43,13 +55,13 @@ ON CoreData.Comments
 AFTER DELETE
 AS
 BEGIN
-
     -- Delete InteractableItems when a Comment is deleted (both OwnInteractableItemID and TargetInteractableItemID are involved)
     DELETE FROM CoreData.InteractableItems WHERE InteractableItemID IN (SELECT OwnInteractableItemID FROM deleted)
     -- Delete any comments replying to this comment
     DELETE FROM CoreData.Comments WHERE ParentCommentID IN (SELECT CommentID FROM deleted);
 END;
 GO
+
 ---SHARE
 CREATE TRIGGER trg_DeleteShareCascade
 ON CoreData.Shares
@@ -57,7 +69,7 @@ AFTER DELETE
 AS
 BEGIN
     -- Delete FeedItems when a Share is deleted
-    DELETE FROM CoreData.FeedItems WHERE FeedItemID IN (SELECT ShareID FROM deleted) AND ActivityType = 'SHARED';
+    DELETE FROM CoreData.FeedItems WHERE ItemID IN (SELECT ShareID FROM deleted) AND ActivityType = 'SHARED';
     -- Delete InteractableItems when a Share is deleted
     DELETE FROM CoreData.InteractableItems WHERE InteractableItemID IN (SELECT InteractableItemID FROM deleted);
 END;

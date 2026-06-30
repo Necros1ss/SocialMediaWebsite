@@ -86,7 +86,7 @@ BEGIN
     
     SET @sql = 'DELETE FROM ' + @tbl + ';';
     
-    PRINT 'Đang xóa: ' + @tbl;
+    PRINT N'Đang xóa: ' + @tbl;
     EXEC sp_executesql @sql;
     
     SET @i = @i + 1;
@@ -108,8 +108,8 @@ WHERE SCHEMA_NAME(schema_id) = 'CoreData';
 EXEC sp_executesql @ResetSQL;
 GO
 
-PRINT '=== XÓA HOÀN TẤT! TẤT CẢ DỮ LIỆU TRONG CoreData ĐÃ BỊ XÓA SẠCH ===';
-PRINT 'Không còn lỗi QUOTED_IDENTIFIER. Identity đã được reset.';
+PRINT N'=== XÓA HOÀN TẤT! TẤT CẢ DỮ LIỆU TRONG CoreData ĐÃ BỊ XÓA SẠCH ===';
+PRINT N'Không còn lỗi QUOTED_IDENTIFIER. Identity đã được reset.';
 
 
 

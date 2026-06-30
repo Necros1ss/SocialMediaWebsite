@@ -1,4 +1,7 @@
-﻿USE SocialMedia;
+USE SocialMedia;
+GO
+SET QUOTED_IDENTIFIER ON;
+SET ANSI_NULLS ON;
 GO
 
 BEGIN TRANSACTION;
@@ -17,7 +20,7 @@ BEGIN TRY
     -- Kiểm tra nếu user không tồn tại
     IF @User1ID IS NULL OR @User2ID IS NULL
     BEGIN
-        PRINT 'Lỗi: Không tìm thấy User với email đã cung cấp.';
+        PRINT N'Lỗi: Không tìm thấy User với email đã cung cấp.';
         ROLLBACK TRANSACTION;
         RETURN;
     END
@@ -102,7 +105,7 @@ BEGIN TRY
     WHERE ConversationID = @ConversationID;
 
     COMMIT TRANSACTION;
-    PRINT 'Đã tạo hội thoại và chèn tin nhắn thành công!';
+    PRINT N'Đã tạo hội thoại và chèn tin nhắn thành công!';
     
     -- Hiển thị kết quả kiểm tra
     SELECT * FROM Messaging.Conversations WHERE ConversationID = @ConversationID;
@@ -116,7 +119,7 @@ BEGIN TRY
 END TRY
 BEGIN CATCH
     ROLLBACK TRANSACTION;
-    PRINT 'Đã xảy ra lỗi: ' + ERROR_MESSAGE();
+    PRINT N'Đã xảy ra lỗi: ' + ERROR_MESSAGE();
 END CATCH;
 GO
 

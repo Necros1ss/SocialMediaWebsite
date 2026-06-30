@@ -1,3 +1,6 @@
+USE SocialMedia;
+GO
+
 IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'Auditing')
     EXEC('CREATE SCHEMA Auditing');
 GO
