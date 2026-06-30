@@ -13,6 +13,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -26,6 +29,30 @@ public class UserController {
         User user = userRepository.findByUserName(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
         return ResponseEntity.ok(user.toUserProfileDto());
+    }
+
+    @GetMapping("/friends")
+    public ResponseEntity<List<UserProfileDto>> getFriends(@AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).build();
+        }
+        User user = userRepository.findByUserName(userDetails.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + userDetails.getUsername()));
+        
+        List<UserProfileDto> friends = user.getFollowings().stream()
+                .map(follow -> follow.getUserFollowing().toUserProfileDto())
+                .collect(Collectors.toList());
+        
+        // Fallback to show other users if no followings exist so the sidebar isn't empty
+        if (friends.isEmpty()) {
+            friends = userRepository.findAll().stream()
+                    .filter(u -> u.getId() != user.getId())
+                    .limit(5)
+                    .map(User::toUserProfileDto)
+                    .collect(Collectors.toList());
+        }
+        
+        return ResponseEntity.ok(friends);
     }
 
     @PostMapping(value = "/profile/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -64,5 +91,16 @@ public class UserController {
 
         User savedUser = userRepository.save(user);
         return ResponseEntity.ok(savedUser.toUserProfileDto());
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<UserProfileDto>> searchUsers(@RequestParam String q) {
+        if (q == null || q.isBlank()) {
+            return ResponseEntity.ok(List.of());
+        }
+        List<UserProfileDto> results = userRepository.searchUsers(q).stream()
+                .map(User::toUserProfileDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(results);
     }
 }

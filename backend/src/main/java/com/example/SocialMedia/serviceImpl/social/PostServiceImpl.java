@@ -156,4 +156,14 @@ public class PostServiceImpl implements PostService {
         post = postRepository.save(post);
         return postMapper.toPostResponse(post);
     }
+
+    @Override
+    public List<PostResponse> searchPosts(String query) {
+        if (query == null || query.isBlank()) {
+            return List.of();
+        }
+        return postRepository.searchPosts(query).stream()
+                .map(postMapper::toPostResponse)
+                .collect(Collectors.toList());
+    }
 }

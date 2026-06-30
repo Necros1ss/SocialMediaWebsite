@@ -8,6 +8,7 @@ import com.example.SocialMedia.exception.ResourceNotFound.ResourceNotFoundExcept
 import com.example.SocialMedia.exception.ResourceNotFound.UserNotFoundException;
 import com.example.SocialMedia.model.coredata_model.*;
 import com.example.SocialMedia.repository.*;
+import com.example.SocialMedia.service.social.NotificationService;
 import com.example.SocialMedia.service.social.ReactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ public class ReactionServiceImpl implements ReactionService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+    private final NotificationService notificationService;
 
     /**
      * Lấy danh sách đếm reaction (Ví dụ: LIKE: 5, LOVE: 2)
@@ -122,6 +124,21 @@ public class ReactionServiceImpl implements ReactionService {
                 newReaction.setReactedLocalDateTime(now);
                 reactionRepository.save(newReaction);
                 action = "ADDED";
+                
+                User itemOwner = null;
+                switch (request.getTargetType()) {
+                    case POST -> {
+                        Post post = postRepository.findById(request.getTargetId()).orElse(null);
+                        if (post != null) itemOwner = post.getUser();
+                    }
+                    case COMMENT -> {
+                        Comment comment = commentRepository.findById(request.getTargetId()).orElse(null);
+                        if (comment != null) itemOwner = comment.getUser();
+                    }
+                }
+                if (itemOwner != null) {
+                    notificationService.createNotification(itemOwner, user, "NEW_REACTION", (long) item.getInteractableItemId());
+                }
             }
         }
         return action;

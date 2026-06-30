@@ -11,6 +11,7 @@ import com.example.SocialMedia.model.coredata_model.*;
 import com.example.SocialMedia.repository.*;
 import com.example.SocialMedia.service.social.CommentService;
 import com.example.SocialMedia.service.social.InteractableItemService;
+import com.example.SocialMedia.service.social.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +34,7 @@ public class CommentServiceImpl implements CommentService {
     private final PostRepository postRepository;
     private final InteractableItemService interactableItemService;
     private final ReactionRepository reactionRepository;
+    private final NotificationService notificationService;
 
     // --- HELPER CONVERT ---
     private CommentResponse convertToSingleCommentResponse(Comment comment){
@@ -112,6 +114,9 @@ public class CommentServiceImpl implements CommentService {
             Comment parent = commentRepository.findByCommentId(request.getParentCommentId())
                     .orElseThrow(() -> new CommentNotFoundException("Parent comment not found"));
             comment.setParentComment(parent);
+            notificationService.createNotification(parent.getUser(), user, "NEW_REPLY", (long) parent.getCommentId());
+        } else {
+            notificationService.createNotification(post.getUser(), user, "NEW_COMMENT", (long) post.getInteractableItem().getInteractableItemId());
         }
 
         // 4. Tạo InteractableItem riêng cho Comment (để Comment cũng có thể được Like)

@@ -17,4 +17,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     Page<Post> findByUserAndDeletedFalse(User user, Pageable pageable);
 
     Optional<Post> findByInteractableItem_InteractableItemId(int interactableItemId);
+
+    @org.springframework.data.jpa.repository.Query("SELECT p FROM Post p WHERE p.isDeleted = false AND LOWER(p.content) LIKE LOWER(CONCAT('%', :query, '%'))")
+    java.util.List<Post> searchPosts(@org.springframework.data.repository.query.Param("query") String query);
 }

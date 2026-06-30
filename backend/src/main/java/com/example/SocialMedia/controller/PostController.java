@@ -102,4 +102,9 @@ public class PostController {
     public ResponseEntity<PostResponse> deletePost(@PathVariable Integer id) {
         return ResponseEntity.ok(postService.deletePost(id));
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<PostResponse>> searchPosts(@RequestParam String q) {
+        return ResponseEntity.ok(postService.searchPosts(q));
+    }
 }

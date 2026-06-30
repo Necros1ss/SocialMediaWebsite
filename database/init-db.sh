@@ -15,6 +15,13 @@ for i in {1..50}; do
     sleep 2
 done
 
+# Check if the database already exists to prevent wiping data on container restart
+DB_CHECK=$($SQLCMD $PARAMS -Q "IF DB_ID('SocialMedia') IS NOT NULL PRINT 'EXISTS'")
+if [[ "$DB_CHECK" == *"EXISTS"* ]]; then
+    echo "Database 'SocialMedia' already exists. Skipping initialization to prevent data loss."
+    exit 0
+fi
+
 echo "Initializing database schema and seeding data..."
 
 $SQLCMD $PARAMS -i "/database/Schema CoreData.sql"
