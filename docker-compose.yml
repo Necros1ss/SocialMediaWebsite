@@ -99,6 +99,8 @@ services:
     container_name: social-backend
     ports:
       - "8080:8080"
+    env_file:
+      - .env
     environment:
       - DB_USER=sa
       - DB_PASSWORD=YourStrong@Pass123
@@ -109,6 +111,9 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:sqlserver://sqlserver:1433;databaseName=SocialMedia;encrypt=true;trustServerCertificate=true
       - SPRING_DATA_REDIS_HOST=redis
       - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_STOMP_PORT=61613
+      - SPRING_RABBITMQ_USERNAME=admin
+      - SPRING_RABBITMQ_PASSWORD=admin123
       - MINIO_URL=http://minio:9000
     depends_on:
       - sqlserver
