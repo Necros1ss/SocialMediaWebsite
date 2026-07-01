@@ -30,9 +30,13 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Optional;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
+@Tag(name = "Authentication", description = "Endpoints for user authentication")
 public class AuthController {
     private final AuthService authService;
     private final OtpService otpService;
@@ -45,6 +49,7 @@ public class AuthController {
     private static final int SIGNUP_EXPIRY_MINUTES = 10;
     @Value("${jwt.refresh.token.cookie.name}")
     private String REFRESH_TOKEN_COOKIE = "refresh_token";
+    @Operation(summary = "Register a new user", description = "Creates a new user account with the provided details")
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(
             @Valid @RequestBody RegisterRequest registerRequest) throws Exception {
@@ -82,6 +87,7 @@ public class AuthController {
         return registerResponse;
     }
 
+    @Operation(summary = "Login user", description = "Authenticates a user and returns a token in cookies")
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(
             @Valid @RequestBody LoginRequest loginRequest,

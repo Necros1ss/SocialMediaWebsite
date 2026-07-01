@@ -8,6 +8,7 @@ import com.example.SocialMedia.service.auth.AuthService;
 import com.example.SocialMedia.service.auth.OtpService;
 
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
@@ -34,7 +35,7 @@ public class VerificationController {
 
 //    private final com.google.firebase.FirebaseApp firebaseApp;
     @PostMapping("/otp")
-    public ResponseEntity<VerifyResponse> verifyOtp(@RequestBody VerifyRequest verifyRequest,
+    public ResponseEntity<VerifyResponse> verifyOtp(@Valid @RequestBody VerifyRequest verifyRequest,
                                                     HttpServletResponse response) throws Exception {
         VerifyResponse responseEntity = new VerifyResponse();
         
@@ -93,7 +94,7 @@ public class VerificationController {
 //        }
 //    }
     @PostMapping("/resend-otp")
-    public ResponseEntity<VerifyResponse> resendOtp(@RequestBody VerifyRequest verifyRequest) {
+    public ResponseEntity<VerifyResponse> resendOtp(@Valid @RequestBody VerifyRequest verifyRequest) {
         VerifyResponse responseEntity = new VerifyResponse();
         otpService.sendOtp(verifyRequest.getIdentifier(), verifyRequest.getChannel());
         responseEntity.setMessage("OTP resent successfully.");

@@ -104,7 +104,7 @@ public class PostController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<PostResponse>> searchPosts(@RequestParam String q) {
-        return ResponseEntity.ok(postService.searchPosts(q));
+    public ResponseEntity<List<PostResponse>> searchPosts(@RequestParam String q, Pageable pageable) {
+        return ResponseEntity.ok(postService.searchPosts(q, pageable));
     }
 }

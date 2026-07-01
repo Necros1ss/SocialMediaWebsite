@@ -25,6 +25,7 @@ public class UserController {
     private final IMinioService minioService;
 
     @GetMapping("/profile/{username}")
+    @org.springframework.cache.annotation.Cacheable(value = "user_profiles", key = "#username")
     public ResponseEntity<UserProfileDto> getProfile(@PathVariable String username) {
         User user = userRepository.findByUserName(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
