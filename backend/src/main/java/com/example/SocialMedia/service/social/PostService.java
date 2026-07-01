@@ -18,5 +18,5 @@ public interface PostService {
 
     PostResponse deletePost(int postId);
     
-    List<PostResponse> searchPosts(String query);
+    List<PostResponse> searchPosts(String query, Pageable pageable);
 }

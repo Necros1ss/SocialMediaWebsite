@@ -58,6 +58,7 @@ public class PostServiceImpl implements PostService {
     // --- MAIN METHODS ---
 
     @Override
+    @org.springframework.cache.annotation.Cacheable(value = "posts", key = "#id")
     public PostResponse getPostById(Integer id) {
         Post post = postRepository.findByPostId(id)
                 .orElseThrow(() -> new PostNotFoundException("Post not found"));
@@ -89,7 +90,8 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostResponse> getPostByUserId(Integer userId, Pageable pageable) {
+    @org.springframework.cache.annotation.Cacheable(value = "user_posts", key = "#userId + '-' + #pageable.pageNumber")
+    public List<PostResponse> getPostByUserId(Integer userId, org.springframework.data.domain.Pageable pageable) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
 
@@ -158,11 +160,11 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostResponse> searchPosts(String query) {
-        if (query == null || query.isBlank()) {
+    public List<PostResponse> searchPosts(String query, Pageable pageable) {
+        if (query == null || query.trim().isEmpty()) {
             return List.of();
         }
-        return postRepository.searchPosts(query).stream()
+        return postRepository.searchPosts(query, pageable).stream()
                 .map(postMapper::toPostResponse)
                 .collect(Collectors.toList());
     }
