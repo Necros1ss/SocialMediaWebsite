@@ -27,14 +27,8 @@ public class ChatMediaController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
-        try {
-            Page<PhotoDto> photos = chatMediaService.getPhotos(conversationId, page, size);
-            return ResponseEntity.ok(photos);
-        } catch (Exception e) {
-            log.error("Error getting photos for conversationId: {}", conversationId, e);
-            return ResponseEntity.internalServerError()
-                    .body(Map.of("error", "Internal Server Error", "message", e.getMessage()));
-        }
+        Page<PhotoDto> photos = chatMediaService.getPhotos(conversationId, page, size);
+        return ResponseEntity.ok(photos);
     }
 
     @GetMapping("/{conversationId}/files")
@@ -43,27 +37,15 @@ public class ChatMediaController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        try {
-            Page<FileDto> files = chatMediaService.getFiles(conversationId, page, size);
-            return ResponseEntity.ok(files);
-        } catch (Exception e) {
-            log.error("Error getting files for conversationId: {}", conversationId, e);
-            return ResponseEntity.internalServerError()
-                    .body(Map.of("error", "Internal Server Error", "message", e.getMessage()));
-        }
+        Page<FileDto> files = chatMediaService.getFiles(conversationId, page, size);
+        return ResponseEntity.ok(files);
     }
 
     @GetMapping("/{conversationId}/members/details")
     public ResponseEntity<?> getConversationMembers(
             @PathVariable int conversationId
     ) {
-        try {
-            List<MemberDto> members = chatMediaService.getMembers(conversationId);
-            return ResponseEntity.ok(members);
-        } catch (Exception e) {
-            log.error("Error getting members for conversationId: {}", conversationId, e);
-            return ResponseEntity.internalServerError()
-                    .body(Map.of("error", "Internal Server Error", "message", e.getMessage()));
-        }
+        List<MemberDto> members = chatMediaService.getMembers(conversationId);
+        return ResponseEntity.ok(members);
     }
 }

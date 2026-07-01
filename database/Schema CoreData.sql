@@ -46,7 +46,12 @@ CREATE TABLE CoreData.Users (
 	AuthProvider NVARCHAR(20),
 	IsVerified BIT NOT NULL DEFAULT 0,
 	IsDeleted BIT NOT NULL DEFAULT 0,
-    DeletedAt DATETIME2 NULL
+    DeletedAt DATETIME2 NULL,
+    ProfileVisibility BIT NOT NULL DEFAULT 1,
+    ActivityStatus BIT NOT NULL DEFAULT 1,
+    DataSharing BIT NOT NULL DEFAULT 0,
+    Language NVARCHAR(100) DEFAULT 'English (US)',
+    Timezone NVARCHAR(100) DEFAULT '(GMT-05:00) Eastern Time'
 );
 GO
 
@@ -514,7 +519,32 @@ WHERE (IsActive = 1);
 CREATE INDEX IX_WebSocketSessions_Expires_Active
 ON CoreData.WebSocketSessions(ExpiresAt, IsActive)
 WHERE (IsActive = 1);
+GO
 
+-- *******************************************************************
+-- 15. Groups & GroupMembers
+-- *******************************************************************
+CREATE TABLE CoreData.Groups (
+    GroupID INT PRIMARY KEY IDENTITY(1,1),
+    Name NVARCHAR(255) NOT NULL,
+    Description NVARCHAR(MAX),
+    CoverPictureURL NVARCHAR(MAX),
+    CreatorID INT NOT NULL,
+    CreatedAt DATETIME NOT NULL DEFAULT GETDATE(),
+    FOREIGN KEY (CreatorID) REFERENCES CoreData.Users(UserID) ON DELETE CASCADE
+);
+GO
+
+CREATE TABLE CoreData.GroupMembers (
+    GroupMemberID INT PRIMARY KEY IDENTITY(1,1),
+    GroupID INT NOT NULL,
+    UserID INT NOT NULL,
+    Role NVARCHAR(50) NOT NULL,
+    JoinedAt DATETIME NOT NULL DEFAULT GETDATE(),
+    FOREIGN KEY (GroupID) REFERENCES CoreData.Groups(GroupID) ON DELETE CASCADE,
+    FOREIGN KEY (UserID) REFERENCES CoreData.Users(UserID) ON DELETE NO ACTION
+);
+GO
 
 USE SocialMedia;
 DECLARE @maxTokenId BIGINT = (SELECT ISNULL(MAX(TokenID), 0) FROM CoreData.RefreshTokens);

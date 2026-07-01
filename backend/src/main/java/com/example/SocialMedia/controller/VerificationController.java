@@ -35,26 +35,21 @@ public class VerificationController {
 //    private final com.google.firebase.FirebaseApp firebaseApp;
     @PostMapping("/otp")
     public ResponseEntity<VerifyResponse> verifyOtp(@RequestBody VerifyRequest verifyRequest,
-                                                    HttpServletResponse response) {
+                                                    HttpServletResponse response) throws Exception {
         VerifyResponse responseEntity = new VerifyResponse();
-        try {
-            Optional<User> exists = authService.findUserByIdentifier(verifyRequest.getIdentifier(), verifyRequest.getChannel());
-            if (exists.isPresent() && exists.get().isVerified()) {
-                responseEntity.setMessage("Identifier already in use.");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseEntity);
-            }
-
-            otpService.verifyOtp(verifyRequest.getIdentifier(), verifyRequest.getOtp(), verifyRequest.getChannel());
-            String key = SIGNUP_KEY_PREFIX + verifyRequest.getIdentifier();
-            registerCacheData(response, key);
-            responseEntity.setMessage("OTP verified successfully.");
-            responseEntity.setIdentifier(verifyRequest.getIdentifier());
-            responseEntity.setChannel(verifyRequest.getChannel());
-            return ResponseEntity.ok(responseEntity);
-        } catch (Exception ex) {
-            responseEntity.setMessage(ex.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseEntity);
+        
+        Optional<User> exists = authService.findUserByIdentifier(verifyRequest.getIdentifier(), verifyRequest.getChannel());
+        if (exists.isPresent() && exists.get().isVerified()) {
+            throw new IllegalArgumentException("Identifier already in use.");
         }
+
+        otpService.verifyOtp(verifyRequest.getIdentifier(), verifyRequest.getOtp(), verifyRequest.getChannel());
+        String key = SIGNUP_KEY_PREFIX + verifyRequest.getIdentifier();
+        registerCacheData(response, key);
+        responseEntity.setMessage("OTP verified successfully.");
+        responseEntity.setIdentifier(verifyRequest.getIdentifier());
+        responseEntity.setChannel(verifyRequest.getChannel());
+        return ResponseEntity.ok(responseEntity);
     }
 
     private void registerCacheData(HttpServletResponse response, String key) throws com.fasterxml.jackson.core.JsonProcessingException {
@@ -100,15 +95,10 @@ public class VerificationController {
     @PostMapping("/resend-otp")
     public ResponseEntity<VerifyResponse> resendOtp(@RequestBody VerifyRequest verifyRequest) {
         VerifyResponse responseEntity = new VerifyResponse();
-        try {
-            otpService.sendOtp(verifyRequest.getIdentifier(), verifyRequest.getChannel());
-            responseEntity.setMessage("OTP resent successfully.");
-            responseEntity.setIdentifier(verifyRequest.getIdentifier());
-            responseEntity.setChannel(verifyRequest.getChannel());
-            return ResponseEntity.ok(responseEntity);
-        } catch (RuntimeException ex) {
-            responseEntity.setMessage(ex.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseEntity);
-        }
+        otpService.sendOtp(verifyRequest.getIdentifier(), verifyRequest.getChannel());
+        responseEntity.setMessage("OTP resent successfully.");
+        responseEntity.setIdentifier(verifyRequest.getIdentifier());
+        responseEntity.setChannel(verifyRequest.getChannel());
+        return ResponseEntity.ok(responseEntity);
     }
 }

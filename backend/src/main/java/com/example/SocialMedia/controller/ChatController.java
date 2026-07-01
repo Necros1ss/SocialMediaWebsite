@@ -47,30 +47,20 @@ public class ChatController {
             @RequestBody ReactionRequest request,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
-        try {
-            String action = chatService.reactToMessage(userDetails.getUsername(), request);
+        String action = chatService.reactToMessage(userDetails.getUsername(), request);
 
-            return ResponseEntity.ok(Map.of(
-                    "message", "Reaction updated successfully",
-                    "action", action,
-                    "targetId", request.getTargetId()
-            ));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(Map.of("message", "Lỗi server: " + e.getMessage()));
-        }
+        return ResponseEntity.ok(Map.of(
+                "message", "Reaction updated successfully",
+                "action", action,
+                "targetId", request.getTargetId()
+        ));
     }
     // 2. Endpoint Lấy danh sách chi tiết người thả tim (Lazy Loading)
     // Dùng khi user click vào icon reaction để xem "Ai đã thả tim?"
     @GetMapping("/messages/{messageId}/reactions")
     public ResponseEntity<?> getMessageReactionDetails(@PathVariable Long messageId) {
-        try {
-            List<ReactionResponse> details = conversationService.getReactionDetails(messageId);
-            return ResponseEntity.ok(details);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
-        }
+        List<ReactionResponse> details = conversationService.getReactionDetails(messageId);
+        return ResponseEntity.ok(details);
     }
     // 1. Cập nhật ảnh đại diện nhóm (Conversation Avatar)
     @PutMapping(value = "/conversations/{conversationId}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -79,25 +69,21 @@ public class ChatController {
             @RequestPart("file") MultipartFile file,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
-        try {
-            if (file == null || file.isEmpty()) {
-                return ResponseEntity.badRequest().body(Map.of("message", "File ảnh không được để trống"));
-            }
-
-            // Gọi Service
-            String newAvatarUrl = conversationService.updateConversationAvatar(
-                    conversationId,
-                    file,
-                    userDetails.getUsername()
-            );
-
-            return ResponseEntity.ok(Map.of(
-                    "message", "Cập nhật ảnh nhóm thành công",
-                    "data", newAvatarUrl
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Lỗi: " + e.getMessage()));
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("File ảnh không được để trống");
         }
+
+        // Gọi Service
+        String newAvatarUrl = conversationService.updateConversationAvatar(
+                conversationId,
+                file,
+                userDetails.getUsername()
+        );
+
+        return ResponseEntity.ok(Map.of(
+                "message", "Cập nhật ảnh nhóm thành công",
+                "data", newAvatarUrl
+        ));
     }
     // 2. Controller endpoint - Thêm vào ConversationController hoặc MessagingController
     @PutMapping("/{conversationId}/nickname")
@@ -105,32 +91,24 @@ public class ChatController {
             @PathVariable Integer conversationId,
             @RequestBody ConversationMemberDTO request,
             @AuthenticationPrincipal UserDetails userDetails) {
-        try {
-            // Lấy targetUserId từ request body - người muốn đổi nickname
-            Integer targetUserId = request.getUserId();
+        // Lấy targetUserId từ request body - người muốn đổi nickname
+        Integer targetUserId = request.getUserId();
 
-            if (targetUserId == null) {
-                return ResponseEntity.badRequest().body(Map.of(
-                        "message", "userId is required"
-                ));
-            }
-
-            conversationService.updateMemberNickname(
-                    conversationId,
-                    targetUserId,
-                    request.getNickname(),
-                    userDetails.getUsername()
-            );
-
-            return ResponseEntity.ok(Map.of(
-                    "message", "Cập nhật biệt danh thành công",
-                    "data", request.getNickname()
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "message", "Lỗi: " + e.getMessage()
-            ));
+        if (targetUserId == null) {
+            throw new IllegalArgumentException("userId is required");
         }
+
+        conversationService.updateMemberNickname(
+                conversationId,
+                targetUserId,
+                request.getNickname(),
+                userDetails.getUsername()
+        );
+
+        return ResponseEntity.ok(Map.of(
+                "message", "Cập nhật biệt danh thành công",
+                "data", request.getNickname()
+        ));
     }
     // 3. Đổi tên nhóm (Conversation Name)
     @PutMapping("/{conversationId}/name")
@@ -139,26 +117,20 @@ public class ChatController {
             @RequestBody Map<String, String> payload, // Nhận JSON: {"conversationName": "Tên Nhóm Mới"}
             @AuthenticationPrincipal UserDetails userDetails
     ) {
-        try {
-            String newName = payload.get("conversationName");
+        String newName = payload.get("conversationName");
 
-            // Validate cơ bản
-            if (newName == null || newName.trim().isEmpty()) {
-                return ResponseEntity.badRequest().body(Map.of("message", "Tên nhóm không được để trống"));
-            }
-
-            // Gọi Service xử lý
-            conversationService.updateConversationName(conversationId, newName, userDetails.getUsername());
-
-            return ResponseEntity.ok(Map.of(
-                    "message", "Đổi tên nhóm thành công",
-                    "data", newName
-            ));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(Map.of("message", "Lỗi server: " + e.getMessage()));
+        // Validate cơ bản
+        if (newName == null || newName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Tên nhóm không được để trống");
         }
+
+        // Gọi Service xử lý
+        conversationService.updateConversationName(conversationId, newName, userDetails.getUsername());
+
+        return ResponseEntity.ok(Map.of(
+                "message", "Đổi tên nhóm thành công",
+                "data", newName
+        ));
     }
 
     // 1. Gửi tin nhắn (Text + File)

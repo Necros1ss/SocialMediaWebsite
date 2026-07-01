@@ -47,41 +47,28 @@ public class AuthController {
     private String REFRESH_TOKEN_COOKIE = "refresh_token";
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(
-            @Valid @RequestBody RegisterRequest registerRequest) {
+            @Valid @RequestBody RegisterRequest registerRequest) throws Exception {
         String recaptchaToken = registerRequest.getRecaptchaToken();
         if (!recaptchaService.verifyRecaptcha(recaptchaToken)) {
-            RegisterResponse bad = new RegisterResponse();
-            bad.setMessage("Recaptcha verification failed.");
-            return new ResponseEntity<>(bad, HttpStatus.BAD_REQUEST);
+            throw new IllegalArgumentException("Recaptcha verification failed.");
         }
-        try {
-            Optional<User> existingUserOpt = authService.findUserByIdentifier(
+        
+        Optional<User> existingUserOpt = authService.findUserByIdentifier(
+                registerRequest.getIdentifier(),
+                registerRequest.getChannel()
+        );
+        if (existingUserOpt.isPresent() && existingUserOpt.get().isVerified()) {
+            throw new IllegalArgumentException("Email hoặc SĐT này đã được sử dụng.");
+        }
+        if (registerRequest.getChannel() == com.example.SocialMedia.constant.OtpChannel.EMAIL) {
+            otpService.sendOtp(
                     registerRequest.getIdentifier(),
                     registerRequest.getChannel()
             );
-            if (existingUserOpt.isPresent() && existingUserOpt.get().isVerified()) {
-                throw new IllegalArgumentException("Email hoặc SĐT này đã được sử dụng.");
-            }
-            if (registerRequest.getChannel() == com.example.SocialMedia.constant.OtpChannel.EMAIL) {
-                otpService.sendOtp(
-                        registerRequest.getIdentifier(),
-                        registerRequest.getChannel()
-                );
-            }
-            authService.cacheRegistrationData(registerRequest, SIGNUP_KEY_PREFIX, SIGNUP_EXPIRY_MINUTES);
-            RegisterResponse registerResponse = getRegisterResponse(registerRequest);
-            return new ResponseEntity<>(registerResponse, HttpStatus.OK);
-        } catch (IllegalArgumentException ex) {
-            RegisterResponse err = new RegisterResponse();
-            err.setMessage(ex.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
-        } catch (Exception ex) {
-            logger.error("Lỗi nghiêm trọng khi đăng ký: {}", ex.getMessage(), ex);
-
-            RegisterResponse err = new RegisterResponse();
-            err.setMessage("Internal server error");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(err);
         }
+        authService.cacheRegistrationData(registerRequest, SIGNUP_KEY_PREFIX, SIGNUP_EXPIRY_MINUTES);
+        RegisterResponse registerResponse = getRegisterResponse(registerRequest);
+        return new ResponseEntity<>(registerResponse, HttpStatus.OK);
     }
 
     private static RegisterResponse getRegisterResponse(RegisterRequest registerRequest) {
@@ -160,30 +147,22 @@ public class AuthController {
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
-        try {
-            Optional<User> existingUserOpt = authService.findUserByIdentifier(request.getIdentifier(), request.getChannel());
-            if (existingUserOpt.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found.");
-            }
-            otpService.sendOtp(request.getIdentifier(), request.getChannel());
-            return ResponseEntity.ok("{\"message\":\"OTP sent successfully.\"}");
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing request.");
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) throws Exception {
+        Optional<User> existingUserOpt = authService.findUserByIdentifier(request.getIdentifier(), request.getChannel());
+        if (existingUserOpt.isEmpty()) {
+            throw new com.example.SocialMedia.exception.ResourceNotFound.UserNotFoundException("User not found.");
         }
+        otpService.sendOtp(request.getIdentifier(), request.getChannel());
+        return ResponseEntity.ok("{\"message\":\"OTP sent successfully.\"}");
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
-        try {
-            boolean isValid = otpService.verifyOtp(request.getIdentifier(), request.getOtp(), request.getChannel());
-            if (!isValid) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired OTP.");
-            }
-            authService.updatePassword(request.getIdentifier(), request.getNewPassword());
-            return ResponseEntity.ok("{\"message\":\"Password updated successfully.\"}");
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing request.");
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest request) throws Exception {
+        boolean isValid = otpService.verifyOtp(request.getIdentifier(), request.getOtp(), request.getChannel());
+        if (!isValid) {
+            throw new IllegalArgumentException("Invalid or expired OTP.");
         }
+        authService.updatePassword(request.getIdentifier(), request.getNewPassword());
+        return ResponseEntity.ok("{\"message\":\"Password updated successfully.\"}");
     }
 }
