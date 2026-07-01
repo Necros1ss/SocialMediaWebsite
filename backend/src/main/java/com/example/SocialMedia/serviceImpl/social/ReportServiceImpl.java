@@ -71,11 +71,11 @@ public class ReportServiceImpl implements ReportService {
         return new ReportDto(
                 report.getReportId(),
                 report.getReportUser().getId(),
-                report.getReportUser().getUserName(),
+                report.getReportUser().getUsername(),
                 report.getPost() != null ? report.getPost().getPostId() : null,
-                report.getComment() != null ? report.getComment().getCommentID() : null,
+                report.getComment() != null ? report.getComment().getCommentId() : null,
                 report.getReportedUser() != null ? report.getReportedUser().getId() : null,
-                report.getReportedUser() != null ? report.getReportedUser().getUserName() : null,
+                report.getReportedUser() != null ? report.getReportedUser().getUsername() : null,
                 report.getReason(),
                 report.getReportStatus(),
                 report.getReportedLocalDateTime()

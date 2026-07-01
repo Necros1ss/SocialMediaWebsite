@@ -67,7 +67,7 @@ public class StoryServiceImpl implements StoryService {
         return new StoryDto(
                 story.getStoryID(),
                 user.getId(),
-                user.getUserName(),
+                user.getUsername(),
                 user.getProfilePictureURL(),
                 story.getMediaURL(),
                 story.getMediaType(),

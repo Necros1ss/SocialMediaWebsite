@@ -117,7 +117,7 @@ public class GroupServiceImpl implements GroupService {
         return groupMemberRepository.findByGroupGroupId(groupId).stream()
                 .map(gm -> new GroupMemberDto(
                         gm.getUser().getId(),
-                        gm.getUser().getUserName(),
+                        gm.getUser().getUsername(),
                         gm.getUser().getProfilePictureURL(),
                         gm.getRole(),
                         gm.getJoinedAt()
@@ -152,7 +152,7 @@ public class GroupServiceImpl implements GroupService {
                 group.getDescription(),
                 group.getCoverPictureURL(),
                 group.getCreator().getId(),
-                group.getCreator().getUserName(),
+                group.getCreator().getUsername(),
                 group.getCreatedAt(),
                 members.size(),
                 isMember,
