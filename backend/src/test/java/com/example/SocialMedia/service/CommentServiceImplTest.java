@@ -50,6 +50,9 @@ public class CommentServiceImplTest {
     @Mock
     private ReactionRepository reactionRepository;
 
+    @Mock
+    private com.example.SocialMedia.service.social.NotificationService notificationService;
+
     @InjectMocks
     private CommentServiceImpl commentService;
 

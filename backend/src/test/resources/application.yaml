@@ -13,7 +13,7 @@ spring:
       port: 1613
 
   datasource:
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MSSQLServer
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MSSQLServer;INIT=CREATE SCHEMA IF NOT EXISTS CoreData\;CREATE SCHEMA IF NOT EXISTS Messaging;
     driver-class-name: org.h2.Driver
     username: sa
     password:
