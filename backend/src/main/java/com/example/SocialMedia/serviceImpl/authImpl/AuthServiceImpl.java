@@ -203,4 +203,11 @@ public class AuthServiceImpl implements AuthService {
         List<RefreshToken> refreshTokens = refreshTokenRepository.findByUserId(userID);
         refreshTokenRepository.deleteAll(refreshTokens);
     }
+
+    @Override
+    public void updatePassword(String identifier, String newPassword) {
+        User user = findUserByIdentifier(identifier).orElseThrow(() -> new RuntimeException("User not found"));
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
 }

@@ -244,6 +244,50 @@ const api = {
     });
     return response.data;
   },
+  getAllGroups: async () => {
+    const response = await apiClient.get('/groups');
+    return response.data;
+  },
+  getMyGroups: async () => {
+    const response = await apiClient.get('/groups/my');
+    return response.data;
+  },
+  searchGroups: async (query) => {
+    const response = await apiClient.get('/groups/search', { params: { query } });
+    return response.data;
+  },
+  getGroupById: async (groupId) => {
+    const response = await apiClient.get(`/groups/${groupId}`);
+    return response.data;
+  },
+  createGroup: async (formData) => {
+    const response = await apiClient.post('/groups', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+  joinGroup: async (groupId) => {
+    const response = await apiClient.post(`/groups/${groupId}/join`);
+    return response.data;
+  },
+  leaveGroup: async (groupId) => {
+    const response = await apiClient.post(`/groups/${groupId}/leave`);
+    return response.data;
+  },
+  getGroupMembers: async (groupId) => {
+    const response = await apiClient.get(`/groups/${groupId}/members`);
+    return response.data;
+  },
+  forgotPassword: async (identifier, channel) => {
+    const response = await apiClient.post('/auth/forgot-password', { identifier, channel });
+    return response.data;
+  },
+  resetPassword: async (identifier, channel, otp, newPassword) => {
+    const response = await apiClient.post('/auth/reset-password', { identifier, channel, otp, newPassword });
+    return response.data;
+  },
   getFriends: async () => {
     const response = await apiClient.get('/users/friends');
     return response.data;

@@ -33,4 +33,5 @@ public interface AuthService {
     void revokeAllRefreshTokens(int userID);
 
     void activeUserAccount(User user);
+    void updatePassword(String identifier, String newPassword);
 }

@@ -156,4 +156,32 @@ public class AuthController {
         cookieService.clearAllAuthCookie(response);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        try {
+            Optional<User> existingUserOpt = authService.findUserByIdentifier(request.getIdentifier(), request.getChannel());
+            if (existingUserOpt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found.");
+            }
+            otpService.sendOtp(request.getIdentifier(), request.getChannel());
+            return ResponseEntity.ok("{\"message\":\"OTP sent successfully.\"}");
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing request.");
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        try {
+            boolean isValid = otpService.verifyOtp(request.getIdentifier(), request.getOtp(), request.getChannel());
+            if (!isValid) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired OTP.");
+            }
+            authService.updatePassword(request.getIdentifier(), request.getNewPassword());
+            return ResponseEntity.ok("{\"message\":\"Password updated successfully.\"}");
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing request.");
+        }
+    }
 }
