@@ -12,10 +12,7 @@ import './styles/responsive.css';
 import api from './services/api';
 
 export default function App() {
-  const [isDark, setIsDark] = useState(() => {
-    const saved = localStorage.getItem('theme');
-    return saved ? saved === 'dark' : true;
-  });
+  const [isDark, setIsDark] = useState(false);
   const [user, setUser] = useState(null);
   const [loadingAuth, setLoadingAuth] = useState(true);
   const navigate = useNavigate();
