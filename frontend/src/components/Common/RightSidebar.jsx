@@ -5,6 +5,7 @@ import api from "../../services/api";
 export default function RightSidebar({ onOpenChat }) {
   const [contacts, setContacts] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
+  const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -35,13 +36,28 @@ export default function RightSidebar({ onOpenChat }) {
         setRecommendations(mapped);
       } catch (err) {
         console.error("Error fetching recommendations:", err);
+      }
+    };
+    
+    const fetchGroups = async () => {
+      try {
+        const myGroups = await api.getMyGroups();
+        const mapped = myGroups.map(g => ({
+          id: g.id,
+          name: g.name,
+          time: "Member"
+        }));
+        setGroups(mapped);
+      } catch (err) {
+        console.error("Error fetching groups:", err);
       } finally {
         setLoading(false);
       }
     };
-    
+
     fetchFriends();
     fetchRecommendations();
+    fetchGroups();
   }, []);
 
   const handleFollow = async (userId) => {

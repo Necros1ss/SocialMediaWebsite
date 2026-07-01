@@ -12,6 +12,7 @@ const Header = ({ userId, onCreatePost, currentView, setCurrentView }) => {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
   
   const navigate = useNavigate();
   const notifRef = useRef(null);
@@ -23,7 +24,14 @@ const Header = ({ userId, onCreatePost, currentView, setCurrentView }) => {
         setUnreadCount(countData.count);
       } catch (err) {}
     };
+    const fetchUser = async () => {
+      try {
+        const user = await api.me();
+        if (user) setCurrentUser(user);
+      } catch (err) {}
+    };
     fetchNotifs();
+    fetchUser();
     const interval = setInterval(fetchNotifs, 60000);
     return () => clearInterval(interval);
   }, []);
@@ -141,8 +149,8 @@ const Header = ({ userId, onCreatePost, currentView, setCurrentView }) => {
           <Zap size={20} />
         </button>
         <button 
-          onClick={() => handleTabClick("group_detail")} 
-          style={{ background: currentView === "group_detail" ? '#e0f2fe' : 'none', border: 'none', padding: '10px', borderRadius: '50%', color: currentView === "group_detail" ? '#1064ea' : '#4b5563', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          onClick={() => handleTabClick("reels")} 
+          style={{ background: currentView === "reels" ? '#e0f2fe' : 'none', border: 'none', padding: '10px', borderRadius: '50%', color: currentView === "reels" ? '#1064ea' : '#4b5563', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
         >
           <Video size={20} />
         </button>
@@ -203,7 +211,7 @@ const Header = ({ userId, onCreatePost, currentView, setCurrentView }) => {
           <Settings size={20} />
         </button>
         <div style={{ width: '36px', height: '36px', borderRadius: '50%', overflow: 'hidden', cursor: 'pointer', border: '2px solid #e5e7eb' }} onClick={() => handleTabClick("author_profile")}>
-          <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=faces" alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <img src={currentUser?.profilePictureURL || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&h=80&fit=crop"} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         </div>
       </div>
 

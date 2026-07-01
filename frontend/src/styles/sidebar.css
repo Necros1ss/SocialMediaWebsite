@@ -2,12 +2,12 @@
   padding: calc(56px + 1rem) 1rem;
 }
 
-.sidebar>* {
+.sidebar .sidebar-item {
   border-radius: 0.5rem;
 }
 
-.sidebar>*:hover {
-  background-color: var(--overlay-color);
+.sidebar .sidebar-item:hover {
+  background-color: #f3f4f6 !important;
 }
 
 .sidebar .container {
