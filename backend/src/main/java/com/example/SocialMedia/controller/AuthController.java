@@ -5,6 +5,8 @@ import com.example.SocialMedia.dto.auth.LoginRequest;
 import com.example.SocialMedia.dto.auth.LoginResponse;
 import com.example.SocialMedia.dto.auth.RegisterRequest;
 import com.example.SocialMedia.dto.auth.RegisterResponse;
+import com.example.SocialMedia.dto.auth.ForgotPasswordRequest;
+import com.example.SocialMedia.dto.auth.ResetPasswordRequest;
 import com.example.SocialMedia.model.coredata_model.RefreshToken;
 import com.example.SocialMedia.model.coredata_model.User;
 import com.example.SocialMedia.service.auth.AuthService;
