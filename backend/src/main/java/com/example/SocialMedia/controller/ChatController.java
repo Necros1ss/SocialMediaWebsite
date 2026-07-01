@@ -29,9 +29,12 @@ import com.example.SocialMedia.dto.request.ReactionRequest;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RestController
 @RequestMapping("/chat")
 @RequiredArgsConstructor
+@Slf4j
 public class ChatController {
 
     private final ChatService chatService;
@@ -141,19 +144,19 @@ public class ChatController {
             @RequestPart(value = "files", required = false) List<MultipartFile> files,
             @AuthenticationPrincipal UserDetails userDetails) throws JsonProcessingException {
 
-        System.out.println("[ChatController] sendMessage called");
-        System.out.println("[ChatController] userDetails: " + (userDetails != null ? userDetails.getUsername() : "NULL"));
-        System.out.println("[ChatController] messageJson: " + messageJson);
-        System.out.println("[ChatController] files: " + (files != null ? files.size() : 0));
+        log.info("[ChatController] sendMessage called");
+        log.info("[ChatController] userDetails: {}", (userDetails != null ? userDetails.getUsername() : "NULL"));
+        log.info("[ChatController] messageJson: {}", messageJson);
+        log.info("[ChatController] files: {}", (files != null ? files.size() : 0));
         if (files != null) {
             for (int i = 0; i < files.size(); i++) {
                 MultipartFile f = files.get(i);
-                System.out.println("[ChatController]   [" + i + "] " + f.getOriginalFilename() + " - " + f.getSize() + " bytes");
+                log.info("[ChatController]   [{}] {} - {} bytes", i, f.getOriginalFilename(), f.getSize());
             }
         }
 
         SendMessageRequest request = new ObjectMapper().readValue(messageJson, SendMessageRequest.class);
-        System.out.println("[ChatController] Request parsed: " + request);
+        log.info("[ChatController] Request parsed: {}", request);
 
         assert userDetails != null;
         MessageResponse response = chatService.sendMessage(userDetails.getUsername(), request, files);
