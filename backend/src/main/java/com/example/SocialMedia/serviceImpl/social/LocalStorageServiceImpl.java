@@ -3,6 +3,7 @@ package com.example.SocialMedia.serviceImpl.social;
 import com.example.SocialMedia.service.social.StorageService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,6 +12,7 @@ import java.nio.file.Paths;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class LocalStorageServiceImpl implements StorageService {
     private final Path uploadDirectory = Paths.get("backend/src/main/resources/static/uploads");
     @Override
@@ -22,7 +24,7 @@ public class LocalStorageServiceImpl implements StorageService {
     }
     @Override
     public void deleteImage(String fileName) throws IOException {
-        System.out.println("Delete directory is: " + uploadDirectory.toAbsolutePath());
+        log.info("Delete directory is: {}", uploadDirectory.toAbsolutePath());
         Path filePath = uploadDirectory.resolve(fileName.substring(fileName.lastIndexOf('/') + 1));
         Files.delete(filePath);
     }

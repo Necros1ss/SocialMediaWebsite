@@ -200,11 +200,11 @@ const api = {
     return response.data;
   },
   getUserProfile: async (username) => {
-    const response = await apiClient.get(`/users/profile/${username}`);
+    const response = await apiClient.get(`/api/users/profile/${username}`);
     return response.data;
   },
   updateUserProfile: async (formData) => {
-    const response = await apiClient.post('/users/profile/update', formData, {
+    const response = await apiClient.post('/api/users/profile/update', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -212,13 +212,13 @@ const api = {
     return response.data;
   },
   getUserPosts: async (userId, page = 0, size = 10) => {
-    const response = await apiClient.get(`/posts/user/${userId}`, {
+    const response = await apiClient.get(`/api/posts/user/${userId}`, {
       params: { page, size }
     });
     return response.data;
   },
   getStories: async () => {
-    const response = await apiClient.get('/stories');
+    const response = await apiClient.get('/api/stories');
     return response.data;
   },
   createStory: async (file, mediaType) => {
@@ -227,7 +227,7 @@ const api = {
     if (mediaType) {
       formData.append('mediaType', mediaType);
     }
-    const response = await apiClient.post('/stories', formData, {
+    const response = await apiClient.post('/api/stories', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -235,33 +235,33 @@ const api = {
     return response.data;
   },
   getReports: async () => {
-    const response = await apiClient.get('/reports');
+    const response = await apiClient.get('/api/reports');
     return response.data;
   },
   updateReportStatus: async (reportId, status) => {
-    const response = await apiClient.put(`/reports/${reportId}/status`, null, {
+    const response = await apiClient.put(`/api/reports/${reportId}/status`, null, {
       params: { status }
     });
     return response.data;
   },
   getAllGroups: async () => {
-    const response = await apiClient.get('/groups');
+    const response = await apiClient.get('/api/groups');
     return response.data;
   },
   getMyGroups: async () => {
-    const response = await apiClient.get('/groups/my');
+    const response = await apiClient.get('/api/groups/my');
     return response.data;
   },
   searchGroups: async (query) => {
-    const response = await apiClient.get('/groups/search', { params: { query } });
+    const response = await apiClient.get('/api/groups/search', { params: { query } });
     return response.data;
   },
   getGroupById: async (groupId) => {
-    const response = await apiClient.get(`/groups/${groupId}`);
+    const response = await apiClient.get(`/api/groups/${groupId}`);
     return response.data;
   },
   createGroup: async (formData) => {
-    const response = await apiClient.post('/groups', formData, {
+    const response = await apiClient.post('/api/groups', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -269,15 +269,15 @@ const api = {
     return response.data;
   },
   joinGroup: async (groupId) => {
-    const response = await apiClient.post(`/groups/${groupId}/join`);
+    const response = await apiClient.post(`/api/groups/${groupId}/join`);
     return response.data;
   },
   leaveGroup: async (groupId) => {
-    const response = await apiClient.post(`/groups/${groupId}/leave`);
+    const response = await apiClient.post(`/api/groups/${groupId}/leave`);
     return response.data;
   },
   getGroupMembers: async (groupId) => {
-    const response = await apiClient.get(`/groups/${groupId}/members`);
+    const response = await apiClient.get(`/api/groups/${groupId}/members`);
     return response.data;
   },
   forgotPassword: async (identifier, channel) => {
@@ -289,43 +289,43 @@ const api = {
     return response.data;
   },
   getFriends: async () => {
-    const response = await apiClient.get('/users/friends');
+    const response = await apiClient.get('/api/users/friends');
     return response.data;
   },
   getRecommendations: async () => {
-    const response = await apiClient.get('/users/recommendations');
+    const response = await apiClient.get('/api/users/recommendations');
     return response.data;
   },
   searchUsers: async (query) => {
-    const response = await apiClient.get('/users/search', { params: { q: query } });
+    const response = await apiClient.get('/api/users/search', { params: { q: query } });
     return response.data;
   },
   searchPosts: async (query) => {
-    const response = await apiClient.get('/posts/search', { params: { q: query } });
+    const response = await apiClient.get('/api/posts/search', { params: { q: query } });
     return response.data;
   },
   getNotifications: async (page = 0, size = 20) => {
-    const response = await apiClient.get('/notifications', { params: { page, size } });
+    const response = await apiClient.get('/api/notifications', { params: { page, size } });
     return response.data;
   },
   getUnreadNotificationCount: async () => {
-    const response = await apiClient.get('/notifications/unread-count');
+    const response = await apiClient.get('/api/notifications/unread-count');
     return response.data;
   },
   markNotificationRead: async (id) => {
-    const response = await apiClient.post(`/notifications/${id}/read`);
+    const response = await apiClient.post(`/api/notifications/${id}/read`);
     return response.data;
   },
   followUser: async (userId) => {
-    const response = await apiClient.post(`/follows/${userId}`);
+    const response = await apiClient.post(`/api/follows/${userId}`);
     return response.data;
   },
   unfollowUser: async (userId) => {
-    const response = await apiClient.delete(`/follows/${userId}`);
+    const response = await apiClient.delete(`/api/follows/${userId}`);
     return response.data;
   },
   checkFollowStatus: async (userId) => {
-    const response = await apiClient.get(`/follows/${userId}/status`);
+    const response = await apiClient.get(`/api/follows/${userId}/status`);
     return response.data;
   },
 };
