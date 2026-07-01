@@ -20,7 +20,7 @@ const GalaxyBackground = ({ isDark }) => {
 		const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
 		camera.position.z = 5;
 
-		const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+		const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false });
 		rendererRef.current = renderer;
 		const dpr = Math.min(window.devicePixelRatio || 1, 2);
 		renderer.setPixelRatio(dpr);
@@ -35,7 +35,7 @@ const GalaxyBackground = ({ isDark }) => {
 
 		// adaptive particle count (balanced for performance)
 		const area = Math.max(1, width * height);
-		const particlesCount = Math.max(600, Math.min(3000, Math.floor(area / 1500)));
+		const particlesCount = Math.max(400, Math.min(800, Math.floor(area / 2000)));
 
 		const positions = new Float32Array(particlesCount * 3);
 		const colors = new Float32Array(particlesCount * 3);
@@ -81,6 +81,10 @@ const GalaxyBackground = ({ isDark }) => {
 		let rafId = null;
 		const animate = () => {
 			rafId = requestAnimationFrame(animate);
+			
+			// Performance: Only render and animate when tab is active/visible
+			if (document.visibilityState !== 'visible') return;
+
 			if (particlesRef.current) {
 				particlesRef.current.rotation.y += 0.0006;
 				particlesRef.current.rotation.x += 0.00025;

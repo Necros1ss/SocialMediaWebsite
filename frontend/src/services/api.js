@@ -217,8 +217,39 @@ const api = {
     });
     return response.data;
   },
+  getStories: async () => {
+    const response = await apiClient.get('/stories');
+    return response.data;
+  },
+  createStory: async (file, mediaType) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (mediaType) {
+      formData.append('mediaType', mediaType);
+    }
+    const response = await apiClient.post('/stories', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+  getReports: async () => {
+    const response = await apiClient.get('/reports');
+    return response.data;
+  },
+  updateReportStatus: async (reportId, status) => {
+    const response = await apiClient.put(`/reports/${reportId}/status`, null, {
+      params: { status }
+    });
+    return response.data;
+  },
   getFriends: async () => {
     const response = await apiClient.get('/users/friends');
+    return response.data;
+  },
+  getRecommendations: async () => {
+    const response = await apiClient.get('/users/recommendations');
     return response.data;
   },
   searchUsers: async (query) => {

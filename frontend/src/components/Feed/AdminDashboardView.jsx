@@ -1,18 +1,36 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Users, FileText, AlertOctagon, Eye, Check, Trash2 } from "lucide-react";
+import api from "../../services/api";
 
 export default function AdminDashboardView() {
+  const [reports, setReports] = useState([]);
+  
+  const fetchReports = async () => {
+    try {
+      const data = await api.getReports();
+      setReports(data);
+    } catch (err) {
+      console.error("Error fetching reports:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchReports();
+  }, []);
+
+  const handleUpdateStatus = async (reportId, status) => {
+    try {
+      await api.updateReportStatus(reportId, status);
+      await fetchReports();
+    } catch (err) {
+      console.error("Error updating report status:", err);
+    }
+  };
+
   const stats = [
     { id: 1, name: "Total Users", value: "542,000", change: "+4.5% from last month", icon: Users, color: '#1064ea', bg: '#e0f2fe' },
     { id: 2, name: "Active Posts", value: "128,400", change: "+2.1% from last month", icon: FileText, color: '#10b981', bg: '#d1fae5' },
-    { id: 3, name: "Reports", value: "1,245", change: "+12% from last month", icon: AlertOctagon, color: '#ef4444', bg: '#fee2e2' }
-  ];
-
-  const reports = [
-    { id: "#4523", reporter: "Anthony Daugloi", content: "Hate Speech in post...", date: "2024-05-20", status: "Pending" },
-    { id: "#4524", reporter: "Anthony Daugloi", content: "Hate Speech in post...", date: "2024-05-20", status: "Pending" },
-    { id: "#4525", reporter: "Anthony Daugloi", content: "Hate Speech in post...", date: "2024-05-20", status: "Pending" },
-    { id: "#4526", reporter: "Anthony Daugloi", content: "Hate Speech in post...", date: "2024-05-20", status: "Pending" }
+    { id: 3, name: "Reports", value: reports.length.toString(), change: "+12% from last month", icon: AlertOctagon, color: '#ef4444', bg: '#fee2e2' }
   ];
 
   return (
@@ -92,25 +110,35 @@ export default function AdminDashboardView() {
             </tr>
           </thead>
           <tbody>
-            {reports.map((report, idx) => (
-              <tr key={idx} style={{ borderBottom: '1px solid #f3f4f6' }}>
-                <td style={{ padding: '12px', fontSize: '13px', color: '#4b5563', fontWeight: '600' }}>{report.id}</td>
-                <td style={{ padding: '12px', fontSize: '13px', color: '#1f2937', fontWeight: '600' }}>{report.reporter}</td>
-                <td style={{ padding: '12px', fontSize: '13px', color: '#4b5563' }}>{report.content}</td>
-                <td style={{ padding: '12px', fontSize: '13px', color: '#9ca3af' }}>{report.date}</td>
+            {reports.map((report) => (
+              <tr key={report.reportId} style={{ borderBottom: '1px solid #f3f4f6' }}>
+                <td style={{ padding: '12px', fontSize: '13px', color: '#4b5563', fontWeight: '600' }}>#{report.reportId}</td>
+                <td style={{ padding: '12px', fontSize: '13px', color: '#1f2937', fontWeight: '600' }}>{report.reporterName}</td>
+                <td style={{ padding: '12px', fontSize: '13px', color: '#4b5563' }}>{report.reason}</td>
+                <td style={{ padding: '12px', fontSize: '13px', color: '#9ca3af' }}>{new Date(report.reportedAt).toLocaleDateString()}</td>
                 <td style={{ padding: '12px' }}>
-                  <span style={{ background: '#fef3c7', color: '#d97706', fontSize: '11px', fontWeight: 'bold', padding: '4px 8px', borderRadius: '12px' }}>{report.status}</span>
+                  <span style={{ 
+                    background: report.reportStatus === 'PENDING' ? '#fef3c7' : '#d1fae5', 
+                    color: report.reportStatus === 'PENDING' ? '#d97706' : '#10b981', 
+                    fontSize: '11px', fontWeight: 'bold', padding: '4px 8px', borderRadius: '12px' 
+                  }}>
+                    {report.reportStatus}
+                  </span>
                 </td>
                 <td style={{ padding: '12px', display: 'flex', gap: '8px' }}>
-                  <button style={{ padding: '6px 12px', background: '#1064ea', border: 'none', borderRadius: '6px', color: '#fff', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <button onClick={() => alert("View content functionality")} style={{ padding: '6px 12px', background: '#1064ea', border: 'none', borderRadius: '6px', color: '#fff', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
                     <Eye size={14} /> View
                   </button>
-                  <button style={{ padding: '6px 12px', background: '#f3f4f6', border: 'none', borderRadius: '6px', color: '#4b5563', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <Check size={14} /> Ignore
-                  </button>
-                  <button style={{ padding: '6px 12px', background: '#fee2e2', border: 'none', borderRadius: '6px', color: '#ef4444', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <Trash2 size={14} /> Ban
-                  </button>
+                  {report.reportStatus === 'PENDING' && (
+                    <>
+                      <button onClick={() => handleUpdateStatus(report.reportId, 'IGNORED')} style={{ padding: '6px 12px', background: '#f3f4f6', border: 'none', borderRadius: '6px', color: '#4b5563', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <Check size={14} /> Ignore
+                      </button>
+                      <button onClick={() => handleUpdateStatus(report.reportId, 'BANNED_USER')} style={{ padding: '6px 12px', background: '#fee2e2', border: 'none', borderRadius: '6px', color: '#ef4444', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <Trash2 size={14} /> Ban
+                      </button>
+                    </>
+                  )}
                 </td>
               </tr>
             ))}

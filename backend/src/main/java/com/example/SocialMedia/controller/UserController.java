@@ -55,6 +55,27 @@ public class UserController {
         return ResponseEntity.ok(friends);
     }
 
+    @GetMapping("/recommendations")
+    public ResponseEntity<List<UserProfileDto>> getRecommendations(@AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).build();
+        }
+        User user = userRepository.findByUserName(userDetails.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + userDetails.getUsername()));
+
+        List<Integer> followingIds = user.getFollowings().stream()
+                .map(follow -> follow.getUserFollowing().getId())
+                .collect(Collectors.toList());
+
+        List<UserProfileDto> recommendations = userRepository.findAll().stream()
+                .filter(u -> u.getId() != user.getId() && !followingIds.contains(u.getId()))
+                .limit(5) // Suggest 5 people
+                .map(User::toUserProfileDto)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(recommendations);
+    }
+
     @PostMapping(value = "/profile/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserProfileDto> updateProfile(
             @RequestParam(value = "fullName", required = false) String fullName,
@@ -63,6 +84,11 @@ public class UserController {
             @RequestParam(value = "phone", required = false) String phone,
             @RequestParam(value = "avatar", required = false) MultipartFile avatar,
             @RequestParam(value = "cover", required = false) MultipartFile cover,
+            @RequestParam(value = "profileVisibility", required = false) Boolean profileVisibility,
+            @RequestParam(value = "activityStatus", required = false) Boolean activityStatus,
+            @RequestParam(value = "dataSharing", required = false) Boolean dataSharing,
+            @RequestParam(value = "language", required = false) String language,
+            @RequestParam(value = "timezone", required = false) String timezone,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         User user = userRepository.findByUserName(userDetails.getUsername())
@@ -79,6 +105,21 @@ public class UserController {
         }
         if (phone != null && !phone.isBlank()) {
             user.setPhoneNumber(phone);
+        }
+        if (profileVisibility != null) {
+            user.setProfileVisibility(profileVisibility);
+        }
+        if (activityStatus != null) {
+            user.setActivityStatus(activityStatus);
+        }
+        if (dataSharing != null) {
+            user.setDataSharing(dataSharing);
+        }
+        if (language != null && !language.isBlank()) {
+            user.setLanguage(language);
+        }
+        if (timezone != null && !timezone.isBlank()) {
+            user.setTimezone(timezone);
         }
         if (avatar != null && !avatar.isEmpty()) {
             var uploadResp = minioService.uploadFile(avatar);

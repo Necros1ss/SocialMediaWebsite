@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Settings, Shield, Lock, Bell, User, CreditCard } from "lucide-react";
+import api from "../../services/api";
 
 export default function PrivacySettingsView() {
   const [subView, setSubView] = useState("privacy");
@@ -9,6 +10,25 @@ export default function PrivacySettingsView() {
 
   const [language, setLanguage] = useState("English (US)");
   const [timezone, setTimezone] = useState("(GMT-05:00) Eastern Time");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    async function loadProfile() {
+      try {
+        const user = await api.me();
+        if (user) {
+          if (user.profileVisibility !== undefined) setVisibility(user.profileVisibility);
+          if (user.activityStatus !== undefined) setActivity(user.activityStatus);
+          if (user.dataSharing !== undefined) setSharing(user.dataSharing);
+          if (user.language) setLanguage(user.language);
+          if (user.timezone) setTimezone(user.timezone);
+        }
+      } catch (err) {
+        console.error("Error loading settings:", err);
+      }
+    }
+    loadProfile();
+  }, []);
 
   const sidebarItems = [
     { id: "general", name: "General", icon: Settings },
@@ -19,8 +39,23 @@ export default function PrivacySettingsView() {
     { id: "billing", name: "Billing", icon: CreditCard }
   ];
 
-  const handleSave = () => {
-    alert("Settings saved successfully!");
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const data = new FormData();
+      data.append("profileVisibility", visibility);
+      data.append("activityStatus", activity);
+      data.append("dataSharing", sharing);
+      data.append("language", language);
+      data.append("timezone", timezone);
+      await api.updateUserProfile(data);
+      alert("Settings saved successfully!");
+    } catch (err) {
+      console.error("Error saving settings:", err);
+      alert("Failed to save settings");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -133,9 +168,10 @@ export default function PrivacySettingsView() {
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
           <button 
             onClick={handleSave}
-            style={{ padding: '12px 28px', background: '#1064ea', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '13px', fontWeight: 'bold', cursor: 'pointer' }}
+            disabled={saving}
+            style={{ padding: '12px 28px', background: '#1064ea', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '13px', fontWeight: 'bold', cursor: 'pointer', opacity: saving ? 0.7 : 1 }}
           >
-            Save Changes
+            {saving ? "Saving..." : "Save Changes"}
           </button>
         </div>
 

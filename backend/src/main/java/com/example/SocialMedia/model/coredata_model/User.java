@@ -64,6 +64,21 @@ public class User implements UserDetails {
     @Column(name = "IsVerified", nullable = false)
     private boolean isVerified;
 
+    @Column(name = "ProfileVisibility", columnDefinition = "boolean default true")
+    private Boolean profileVisibility = true;
+
+    @Column(name = "ActivityStatus", columnDefinition = "boolean default true")
+    private Boolean activityStatus = true;
+
+    @Column(name = "DataSharing", columnDefinition = "boolean default false")
+    private Boolean dataSharing = false;
+
+    @Column(name = "Language")
+    private String language = "English (US)";
+
+    @Column(name = "Timezone")
+    private String timezone = "(GMT-05:00) Eastern Time";
+
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RefreshToken> refreshTokens;
 
@@ -154,7 +169,12 @@ public class User implements UserDetails {
                 this.authProvider,
                 this.bio,
                 this.coverPictureURL,
-                this.userName
+                this.userName,
+                this.profileVisibility,
+                this.activityStatus,
+                this.dataSharing,
+                this.language,
+                this.timezone
         );
     }
 }

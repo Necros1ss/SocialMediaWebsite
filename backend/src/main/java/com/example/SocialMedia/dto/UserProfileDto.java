@@ -18,4 +18,9 @@ public class UserProfileDto {
     private String bio;
     private String cover;
     private String username;
+    private Boolean profileVisibility;
+    private Boolean activityStatus;
+    private Boolean dataSharing;
+    private String language;
+    private String timezone;
 }
