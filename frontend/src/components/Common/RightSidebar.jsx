@@ -71,6 +71,9 @@ export default function RightSidebar({ onOpenChat }) {
     }
   };
 
+  return (
+    <div className="right-sidebar" style={{ width: '280px', padding: '24px 16px', borderLeft: '1px solid #e5e7eb', background: '#f9fafb', height: 'calc(100vh - 65px)', overflowY: 'auto', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+
       {/* People You May Know Card */}
       {recommendations.length > 0 && (
         <div style={{ background: '#fff', borderRadius: '12px', border: '1px solid #e5e7eb', padding: '16px', boxSizing: 'border-box' }}>
