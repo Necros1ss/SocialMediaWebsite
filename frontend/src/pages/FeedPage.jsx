@@ -21,7 +21,6 @@ import "../styles/feed.css";
 const FeedPage = ({
   userId,
   isDark,
-  setIsDark,
   onLogout,
 }) => {
   const navigate = useNavigate();
@@ -109,8 +108,6 @@ const FeedPage = ({
     <div className={`app grid ${isDark ? "dark" : "light"}`} style={{ height: '100vh', overflow: 'hidden' }}>
       <SearchBar userId={userId} onCreatePost={handleCreatePost} currentView={currentView} setCurrentView={setCurrentView} />
       <Sidebar
-        isDark={isDark}
-        setIsDark={setIsDark}
         currentView={currentView}
         setCurrentView={setCurrentView}
         onLogout={onLogout}

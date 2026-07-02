@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Tv, Award, Globe, Users, User, Mail, MapPin, Calendar, Radio, LogOut } from "lucide-react";
 import "../../styles/sidebar.css";
 
-const Sidebar = ({ isDark, setIsDark, currentView, setCurrentView, onLogout }) => {
+const Sidebar = ({ currentView, setCurrentView, onLogout }) => {
   const navigate = useNavigate();
 
   const handleNavClick = (view) => {

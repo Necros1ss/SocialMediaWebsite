@@ -11,7 +11,7 @@ import OTPVerification from '../components/Auth/OTPVerification';
 import ForgotPwdForm from '../components/Auth/ForgotPwdForm';
 import SocialButton from '../components/Common/SocialButton';
 
-const AuthPage = ({ isDark, onToggleDark, onAuthSuccess, initialMode }) => {
+const AuthPage = ({ isDark, onAuthSuccess, initialMode }) => {
   const [mode, setMode] = useState(initialMode || 'login');
   const [showOTP, setShowOTP] = useState(false);
   const [shouldAutoSend, setShouldAutoSend] = useState(false);
@@ -63,9 +63,6 @@ const AuthPage = ({ isDark, onToggleDark, onAuthSuccess, initialMode }) => {
 
   return (
     <div className="auth-page">
-      <button className="theme-toggle" onClick={onToggleDark}>
-        {isDark ? <Sun size={20} /> : <Moon size={20} />}
-      </button>
       {mode === 'forgot' ? (
         <ForgotPwdForm onBackToLogin={() => handleSwitch('login')} />
       ) : (

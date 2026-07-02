@@ -12,7 +12,6 @@ import './styles/responsive.css';
 import api from './services/api';
 
 export default function App() {
-  const [isDark, setIsDark] = useState(false);
   const [user, setUser] = useState(null);
   const [loadingAuth, setLoadingAuth] = useState(true);
   const navigate = useNavigate();
@@ -59,24 +58,20 @@ export default function App() {
     return () => { mounted = false; };
   }, []);
 
-  // Sync dark mode with localStorage
-  useEffect(() => {
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-  }, [isDark]);
-
   if (loadingAuth) {
     return <div className="loading" style={{ color: '#fff', textAlign: 'center', marginTop: '20%' }}>Loading...</div>;
   }
 
   const isAuthRoute = location.pathname === '/login' || location.pathname === '/register';
+  const isDark = isAuthRoute; // Force Dark mode for login/register, Light mode for everything else
 
   return (
     <div className={`app ${isDark ? 'dark' : 'light'}`}>
       {isAuthRoute && <GalaxyBackground isDark={isDark} />}
       <div className="app-content">
         <Routes>
-          <Route path="/login" element={user ? <Navigate to="/" replace /> : <AuthPage isDark={isDark} onToggleDark={() => setIsDark(!isDark)} initialMode="login" onAuthSuccess={handleAuthSuccess} />} />
-          <Route path="/register" element={user ? <Navigate to="/" replace /> : <AuthPage isDark={isDark} onToggleDark={() => setIsDark(!isDark)} initialMode="register" onAuthSuccess={handleAuthSuccess} />} />
+          <Route path="/login" element={user ? <Navigate to="/" replace /> : <AuthPage isDark={isDark} initialMode="login" onAuthSuccess={handleAuthSuccess} />} />
+          <Route path="/register" element={user ? <Navigate to="/" replace /> : <AuthPage isDark={isDark} initialMode="register" onAuthSuccess={handleAuthSuccess} />} />
           <Route path="/oauth2/success" element={<OAuth2Callback onAuthSuccess={handleAuthSuccess} />} />
           
           <Route path="/" element={
@@ -84,7 +79,6 @@ export default function App() {
               <FeedPage
                 userId={user?.userId || user?.id}
                 isDark={isDark}
-                setIsDark={setIsDark}
                 onLogout={handleLogout}
               />
             </ProtectedRoute>
