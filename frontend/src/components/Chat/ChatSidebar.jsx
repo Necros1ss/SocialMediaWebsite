@@ -1,6 +1,7 @@
 import React from 'react';
 
 const ChatSidebar = ({
+  onBack,
   conversations,
   activeConv,
   onSelectConversation,
@@ -18,6 +19,14 @@ const ChatSidebar = ({
           </div>
           <div className="chat-sidebar-title">Đoạn chat</div>
         </div>
+        {onBack && (
+          <button className="chat-action-btn chat-back-btn" title="Quay lại Feed" onClick={onBack}>
+            <svg fill="currentColor" height="16" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
+            </svg>
+            Feed
+          </button>
+        )}
       </div>
       <div className="chat-search"><input placeholder="Tìm kiếm trên Messenger" /></div>
       <div className="chat-list">

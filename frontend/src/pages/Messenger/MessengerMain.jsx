@@ -6,6 +6,7 @@ import MessengerComposer from './MessengerComposer';
 
 export default function MessengerMain(props) {
   const {
+    onBack,
     conversations,
     activeConv,
     setActiveConv,
@@ -41,6 +42,7 @@ export default function MessengerMain(props) {
   return (
     <div className="chat-layout">
       <ChatSidebar
+        onBack={onBack}
         conversations={conversations}
         activeConv={activeConv}
         onSelectConversation={(c) => setActiveConv(c)}
