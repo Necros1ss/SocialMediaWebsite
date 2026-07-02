@@ -61,7 +61,7 @@ const ChatSidebar = ({
       </div>
       <div style={{ padding: '8px' }}>
         <input value={conversationId} onChange={(e) => setConversationId(e.target.value)} placeholder="Conversation ID" style={{ width: '100%', padding: '8px', borderRadius: '6px' }} />
-        <button onClick={addConversation} style={{ marginTop: '8px', width: '100%', padding: '8px', borderRadius: '6px', background: '#667eea', color: 'white', border: 'none' }}>Open</button>
+        <button onClick={addConversation} style={{ marginTop: '8px', width: '100%', padding: '8px', borderRadius: '6px', background: '#1064ea', color: 'white', border: 'none', cursor: 'pointer' }}>Open</button>
       </div>
     </aside>
   );
