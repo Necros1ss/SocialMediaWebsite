@@ -402,6 +402,25 @@ CREATE INDEX IX_Blocks_BlockedUserID
 ON CoreData.Blocks(BlockedUserID);
 GO
 
+-- Friendships
+CREATE TABLE CoreData.Friendships (
+    FriendshipID INT PRIMARY KEY IDENTITY(1,1),
+    RequesterID INT NOT NULL,
+    AddresseeID INT NOT NULL,
+    Status NVARCHAR(20) NOT NULL CHECK (Status IN ('PENDING', 'ACCEPTED', 'DECLINED', 'BLOCKED')),
+    CreatedAt DATETIME NOT NULL DEFAULT GETDATE(),
+    UpdatedAt DATETIME NOT NULL DEFAULT GETDATE(),
+    FOREIGN KEY (RequesterID) REFERENCES CoreData.Users(UserID) ON DELETE CASCADE,
+    FOREIGN KEY (AddresseeID) REFERENCES CoreData.Users(UserID),
+    CONSTRAINT UQ_Friendship UNIQUE (RequesterID, AddresseeID),
+    CHECK (RequesterID <> AddresseeID)
+);
+GO
+
+CREATE INDEX IX_Friendships_RequesterID ON CoreData.Friendships(RequesterID);
+CREATE INDEX IX_Friendships_AddresseeID ON CoreData.Friendships(AddresseeID);
+GO
+
 -- *******************************************************************
 -- 11. REPORTS
 -- *******************************************************************

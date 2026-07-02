@@ -11,12 +11,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Override
     @Transactional
@@ -30,7 +35,22 @@ public class NotificationServiceImpl implements NotificationService {
         notification.setActor(actor);
         notification.setNotificationType(type);
         notification.setTargetItemId(targetId);
-        notificationRepository.save(notification);
+        notification = notificationRepository.save(notification);
+        
+        // Push WebSocket notification
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("id", notification.getId());
+        payload.put("type", type);
+        payload.put("actorName", actor.getFullName() != null ? actor.getFullName() : actor.getUsername());
+        payload.put("actorAvatar", actor.getProfilePictureURL());
+        payload.put("targetId", targetId);
+        payload.put("isRead", false);
+        
+        messagingTemplate.convertAndSendToUser(
+            recipient.getUsername(),
+            "/queue/notifications",
+            payload
+        );
     }
 
     @Override

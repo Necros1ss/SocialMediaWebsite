@@ -71,3 +71,15 @@ export function sendTyping(conversationId, isTyping, userId, username) {
     console.error('[Typing] Failed to send:', e);
   }
 }
+
+export function subscribeNotifications(username, cb) {
+  const client = clientInstance;
+  if (!client || !isConnected) return null;
+  const dest = `/user/${username}/queue/notifications`;
+  return client.subscribe(dest, (msg) => {
+    try {
+      const body = JSON.parse(msg.body);
+      cb(body);
+    } catch (e) { cb({ raw: msg.body }); }
+  });
+}

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Home, Zap, Video, User, ShoppingBag, Bell, MessageCircle, Settings, Search } from "lucide-react";
 import Modal from "./Modal";
 import api from "../../services/api";
+import useNotifications from "../../hooks/useNotifications";
 import "../../styles/searchbar.css";
 
 const Header = ({ userId, onCreatePost, currentView, setCurrentView }) => {
@@ -10,31 +11,36 @@ const Header = ({ userId, onCreatePost, currentView, setCurrentView }) => {
   const [searchResults, setSearchResults] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0);
   const [showNotifications, setShowNotifications] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   
   const navigate = useNavigate();
   const notifRef = useRef(null);
 
+  // Use the new hook for WebSocket notifications
+  const { 
+    notifications: liveNotifications, 
+    unreadCount, 
+    setUnreadCount,
+    setNotifications: setLiveNotifications 
+  } = useNotifications(currentUser);
+
   useEffect(() => {
-    const fetchNotifs = async () => {
-      try {
-        const countData = await api.getUnreadNotificationCount();
-        setUnreadCount(countData.count);
-      } catch (err) {}
-    };
     const fetchUser = async () => {
       try {
         const user = await api.me();
         if (user) setCurrentUser(user);
       } catch (err) {}
     };
-    fetchNotifs();
     fetchUser();
-    const interval = setInterval(fetchNotifs, 60000);
-    return () => clearInterval(interval);
   }, []);
+
+  // Sync live notifications with local state if needed, or just use liveNotifications when showing
+  useEffect(() => {
+    if (liveNotifications.length > 0) {
+      setNotifications(liveNotifications);
+    }
+  }, [liveNotifications]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {

@@ -21,25 +21,25 @@ export default defineConfig(({ mode }) => {
       host: true,
       proxy: {
         '/api': {
-          target: 'http://backend:8080',
+          target: 'http://localhost:8080',
           changeOrigin: true,
           secure: false,
           cookieDomainRewrite: { '*': '' }
         },
         '/auth': {
-          target: 'http://backend:8080',
+          target: 'http://localhost:8080',
           changeOrigin: true,
           secure: false,
           cookieDomainRewrite: { '*': '' }
         },
         '/chat': {
-          target: 'http://backend:8080',
+          target: 'http://localhost:8080',
           changeOrigin: true,
           secure: false,
           cookieDomainRewrite: { '*': '' }
         },
         '/ws': {
-          target: 'http://backend:8080',
+          target: 'http://localhost:8080',
           changeOrigin: true,
           ws: true,
           secure: false
