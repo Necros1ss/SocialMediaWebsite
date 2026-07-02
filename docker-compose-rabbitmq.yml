@@ -11,8 +11,8 @@ services:
       - "1613:61613"
       - "15674:15674"
     environment:
-      RABBITMQ_DEFAULT_USER: admin
-      RABBITMQ_DEFAULT_PASS: admin123
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
       RABBITMQ_DEFAULT_VHOST: /
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq

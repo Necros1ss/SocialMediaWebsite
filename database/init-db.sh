@@ -2,7 +2,7 @@
 echo "Waiting for SQL Server to start..."
 
 SQLCMD="/opt/mssql-tools18/bin/sqlcmd"
-PARAMS="-S sqlserver -U sa -P YourStrong@Pass123 -C -f 65001"
+PARAMS="-S sqlserver -U $DB_USER -P $DB_PASSWORD -C -f 65001"
 
 # Loop to wait for SQL Server to be ready
 for i in {1..50}; do
