@@ -211,6 +211,41 @@ const api = {
     });
     return response.data;
   },
+  // Friend API
+  sendFriendRequest: async (userId) => {
+    const response = await apiClient.post(`/api/friends/request/${userId}`);
+    return response.data;
+  },
+  acceptFriendRequest: async (userId) => {
+    const response = await apiClient.post(`/api/friends/accept/${userId}`);
+    return response.data;
+  },
+  declineFriendRequest: async (userId) => {
+    const response = await apiClient.post(`/api/friends/decline/${userId}`);
+    return response.data;
+  },
+  unfriend: async (userId) => {
+    const response = await apiClient.delete(`/api/friends/unfriend/${userId}`);
+    return response.data;
+  },
+  getFriends: async () => {
+    const response = await apiClient.get('/api/friends/list');
+    return response.data;
+  },
+  getIncomingFriendRequests: async () => {
+    const response = await apiClient.get('/api/friends/requests/incoming');
+    return response.data;
+  },
+  getFriendSuggestions: async () => {
+    const response = await apiClient.get('/api/friends/suggestions');
+    return response.data;
+  },
+  searchUsers: async (query) => {
+    const response = await apiClient.get('/api/users/search', {
+      params: { q: query }
+    });
+    return response.data;
+  },
   getUserPosts: async (userId, page = 0, size = 10) => {
     const response = await apiClient.get(`/api/posts/user/${userId}`, {
       params: { page, size }

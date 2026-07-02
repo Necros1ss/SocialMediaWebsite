@@ -5,6 +5,7 @@ import api from "../../services/api";
 export default function RightSidebar({ onOpenChat }) {
   const [contacts, setContacts] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
+  const [friendRequests, setFriendRequests] = useState([]);
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -14,8 +15,8 @@ export default function RightSidebar({ onOpenChat }) {
         const data = await api.getFriends();
         const mapped = data.map((friend) => ({
           id: friend.id,
-          name: friend.name || friend.username,
-          avatar: friend.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&h=80&fit=crop",
+          name: friend.name || friend.username || friend.fullName,
+          avatar: friend.avatar || friend.profilePictureURL || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&h=80&fit=crop",
           status: "online",
         }));
         setContacts(mapped);
@@ -26,11 +27,11 @@ export default function RightSidebar({ onOpenChat }) {
     
     const fetchRecommendations = async () => {
       try {
-        const recs = await api.getRecommendations();
+        const recs = await api.getFriendSuggestions();
         const mapped = recs.map(u => ({
           id: u.id,
-          name: u.name || u.username,
-          avatar: u.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&h=80&fit=crop",
+          name: u.name || u.username || u.fullName,
+          avatar: u.avatar || u.profilePictureURL || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&h=80&fit=crop",
           bio: u.bio || "Suggested for you"
         }));
         setRecommendations(mapped);
@@ -38,10 +39,25 @@ export default function RightSidebar({ onOpenChat }) {
         console.error("Error fetching recommendations:", err);
       }
     };
+
+    const fetchRequests = async () => {
+      try {
+        const reqs = await api.getIncomingFriendRequests();
+        const mapped = reqs.map(u => ({
+          id: u.id,
+          name: u.name || u.username || u.fullName,
+          avatar: u.avatar || u.profilePictureURL || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&h=80&fit=crop",
+          bio: u.bio || "Sent you a request"
+        }));
+        setFriendRequests(mapped);
+      } catch (err) {
+        console.error("Error fetching friend requests:", err);
+      }
+    };
     
     const fetchGroups = async () => {
       try {
-        const myGroups = await api.getMyGroups();
+        const myGroups = await api.getAllGroups(); // temp fallback
         const mapped = myGroups.map(g => ({
           id: g.id,
           name: g.name,
@@ -57,22 +73,63 @@ export default function RightSidebar({ onOpenChat }) {
 
     fetchFriends();
     fetchRecommendations();
+    fetchRequests();
     fetchGroups();
   }, []);
 
   const handleFollow = async (userId) => {
     try {
-      await api.followUser(userId);
-      // Remove from recommendations
+      await api.sendFriendRequest(userId);
       setRecommendations(prev => prev.filter(r => r.id !== userId));
-      // Optionally could refresh friends list here too
     } catch (err) {
-      console.error("Failed to follow:", err);
+      console.error("Failed to send request:", err);
+    }
+  };
+
+  const handleAccept = async (userId) => {
+    try {
+      await api.acceptFriendRequest(userId);
+      setFriendRequests(prev => prev.filter(r => r.id !== userId));
+      // Optionally reload contacts
+      const updated = await api.getFriends();
+      setContacts(updated.map(f => ({
+        id: f.id,
+        name: f.name || f.username || f.fullName,
+        avatar: f.avatar || f.profilePictureURL || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&h=80&fit=crop",
+        status: "online",
+      })));
+    } catch (err) {
+      console.error("Failed to accept:", err);
     }
   };
 
   return (
     <div className="right-sidebar" style={{ width: '280px', padding: '24px 16px', borderLeft: '1px solid #e5e7eb', background: '#f9fafb', height: 'calc(100vh - 65px)', overflowY: 'auto', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+
+      {/* Friend Requests Card */}
+      {friendRequests.length > 0 && (
+        <div style={{ background: '#fff', borderRadius: '12px', border: '1px solid #e5e7eb', padding: '16px', boxSizing: 'border-box' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 'bold', color: '#1f2937' }}>Friend Requests</h4>
+            <span style={{ fontSize: '12px', color: '#1064ea', fontWeight: '600', cursor: 'pointer' }}>See all</span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {friendRequests.map((req) => (
+              <div key={req.id} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                <img src={req.avatar} alt={req.name} style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover' }} />
+                <div style={{ flex: 1 }}>
+                  <h5 style={{ margin: 0, fontSize: '13px', fontWeight: '600', color: '#1f2937' }}>{req.name}</h5>
+                  <span style={{ fontSize: '11px', color: '#9ca3af' }}>{req.bio}</span>
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                    <button onClick={() => handleAccept(req.id)} style={{ flex: 1, padding: '6px 10px', background: '#1064ea', border: 'none', borderRadius: '20px', color: '#fff', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer' }}>Accept</button>
+                    <button onClick={() => setFriendRequests(prev => prev.filter(r => r.id !== req.id))} style={{ flex: 1, padding: '6px 10px', background: '#f3f4f6', border: 'none', borderRadius: '20px', color: '#4b5563', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer' }}>Decline</button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* People You May Know Card */}
       {recommendations.length > 0 && (
