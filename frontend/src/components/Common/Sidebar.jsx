@@ -42,6 +42,17 @@ const Sidebar = ({ currentView, setCurrentView, onLogout }) => {
           </div>
 
           <div
+            className={`sidebar-item ${currentView === "reels" ? "active" : ""}`}
+            onClick={() => handleNavClick("reels")}
+            style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', borderRadius: '8px', cursor: 'pointer', transition: 'background-color 0.2s', background: currentView === "reels" ? '#f0f2f5' : 'transparent' }}
+          >
+            <div style={{ background: '#ec4899', padding: '6px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+              <Video size={16} />
+            </div>
+            <span style={{ fontSize: '14px', fontWeight: '600', color: '#4b5563' }}>Reels</span>
+          </div>
+
+          <div
             className={`sidebar-item ${currentView === "explore_stories" ? "active" : ""}`}
             onClick={() => handleNavClick("explore_stories")}
             style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', borderRadius: '8px', cursor: 'pointer', transition: 'background-color 0.2s', background: currentView === "explore_stories" ? '#f0f2f5' : 'transparent' }}

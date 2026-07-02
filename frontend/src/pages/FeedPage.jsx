@@ -6,6 +6,7 @@ import Sidebar from "../components/Common/Sidebar";
 import SearchBar from "../components/Common/SearchBar";
 import RightSidebar from "../components/Common/RightSidebar";
 import Stories from "../components/Feed/Stories";
+import Reels from "../components/Feed/Reels";
 import CreatePostCard from "../components/Feed/CreatePostCard";
 import GroupsGrid from "../components/Feed/GroupsGrid";
 import EditProfileView from "../components/Feed/EditProfileView";
@@ -112,10 +113,14 @@ const FeedPage = ({
         setCurrentView={setCurrentView}
         onLogout={onLogout}
       />
-      {currentView === "home" || currentView === "post" ? (
+      {currentView === "home" || currentView === "post" || currentView === "reels" || currentView === "near_hotel" ? (
         <>
           <div className="feed-container" style={{ padding: '24px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '20px', height: '100%', boxSizing: 'border-box' }}>
-            {currentView === "home" ? (
+            {currentView === "near_hotel" && <ComingSoonView />}
+            {currentView === "reels" && <Reels userId={userId} />}
+
+            {/* New Feeds view specific rendering */}
+            {["home", "popular", "discussion"].includes(currentView) ? (
               <>
                 {loading ? (
                   <div className="loading" style={{ padding: '40px', textAlign: 'center' }}>Loading...</div>
@@ -135,9 +140,9 @@ const FeedPage = ({
                   </>
                 )}
               </>
-            ) : (
+            ) : currentView === "post" ? (
               <Post userId={userId} post={selectedPost} goBack={goBack} />
-            )}
+            ) : null}
           </div>
           <RightSidebar onOpenChat={() => navigate("/messenger")} />
         </>

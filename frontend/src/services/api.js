@@ -269,6 +269,25 @@ const api = {
     });
     return response.data;
   },
+  getReels: async (page = 0, size = 10) => {
+    const response = await apiClient.get('/api/reels', {
+      params: { page, size }
+    });
+    return response.data;
+  },
+  createReel: async (file, caption) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (caption) {
+      formData.append('caption', caption);
+    }
+    const response = await apiClient.post('/api/reels', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
   getReports: async () => {
     const response = await apiClient.get('/api/reports');
     return response.data;
